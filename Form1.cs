@@ -11,6 +11,8 @@ namespace Windows_Forms_Attempt
         private Motorcycle motorcycle;
         private ArrayGrid grid;
 
+        private List<ArrayGrid.Node> nodes;
+
         public Form1()
         {
             InitializeComponent_1();
@@ -24,7 +26,7 @@ namespace Windows_Forms_Attempt
             // Configuración del formulario
             this.ClientSize = new System.Drawing.Size(1400, 800);
             this.Name = "Form1";
-            this.Text = "Mi Proyecto WinForms";
+            this.Text = "Trone Game";
 
             // Inicializar PictureBox
             this.pictureBox1 = new PictureBox();
@@ -41,13 +43,13 @@ namespace Windows_Forms_Attempt
                 "Imagenes/jugador/moto_jugador_abajo.png"
             };
 
-            this.motorcycle = new Motorcycle(5, 5, 4, images_player, this.pictureBox1);
+            this.motorcycle = new Motorcycle(5, 5, 4, images_player, this.pictureBox1, 1);
         }
 
         private void CreateGridDisplay()
         {
             grid = new ArrayGrid(24, 16);
-            List<ArrayGrid.Node> nodes = grid.GetNodes();
+            nodes = grid.GetNodes();
             int nodeSize = 50; // Tamaño de cada PictureBox
 
             foreach (ArrayGrid.Node node in nodes)
@@ -65,20 +67,27 @@ namespace Windows_Forms_Attempt
 
         private void Movement(object sender, KeyEventArgs e)
         {
-            // Verificar qué tecla de flecha fue presionada
             switch (e.KeyCode)
             {
                 case Keys.Up:
                     this.motorcycle.Move_Image(2);
+                    this.motorcycle.Change_Direction(2);
+                    this.motorcycle.Change_Position(nodes);
                     break;
                 case Keys.Down:
                     this.motorcycle.Move_Image(3);
+                    this.motorcycle.Change_Direction(4);
+                    this.motorcycle.Change_Position(nodes);
                     break;
                 case Keys.Left:
                     this.motorcycle.Move_Image(1);
+                    this.motorcycle.Change_Direction(3);
+                    this.motorcycle.Change_Position(nodes);
                     break;
                 case Keys.Right:
                     this.motorcycle.Move_Image(0);
+                    this.motorcycle.Change_Direction(1);
+                    this.motorcycle.Change_Position(nodes);
                     break;
             }
         }
