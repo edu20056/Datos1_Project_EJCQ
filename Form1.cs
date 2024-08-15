@@ -57,7 +57,7 @@ namespace Windows_Forms_Attempt
         {
             // Update motorcycle speed and timer interval based on the value in the TextBox
             int newSpeed;
-            if (int.TryParse(speedTextBox.Text, out newSpeed) && newSpeed > 0)
+            if (int.TryParse(speedTextBox.Text, out newSpeed) && newSpeed > 0) //Transforms current string in speedTextBox into int called newSpeed
             {
                 this.motorcycle.SetSpeed(newSpeed);
                 executionsPerSecond = newSpeed; // Use the new speed as the execution rate

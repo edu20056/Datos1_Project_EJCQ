@@ -91,7 +91,7 @@ namespace Windows_Forms_Attempt
                     break;
             }
 
-            if (current != null)
+            if (current != null) // Place the player on the grid
             {
                 this.x = current.GetX();
                 this.y = current.GetY();
