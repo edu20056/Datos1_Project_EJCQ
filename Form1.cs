@@ -5,59 +5,63 @@ namespace Windows_Forms_Attempt
 {
     public partial class Form1 : Form
     {
-        private Button button1;
-        private TextBox textBox1;
-
         private PictureBox pictureBox1;
+        private Motorcycle motorcycle;
 
         public Form1()
         {
-            InitializeComponentForm();
+            InitializeComponent_1();
+            // Configurar el formulario para capturar eventos de teclado
+            this.KeyPreview = true;
+
+            // Suscribirse al evento KeyDown
+            this.KeyDown += new KeyEventHandler(Movement);
         }
 
-        private void InitializeComponentForm()
+        private void Movement(object sender, KeyEventArgs e)
         {
-            this.button1 = new Button();
-            this.textBox1 = new TextBox();
+            // Verificar qué tecla de flecha fue presionada
+            switch (e.KeyCode)
+            {
+                case Keys.Up:
+                    this.motorcycle.Move(2);
+                    break;
+                case Keys.Down:
+                    this.motorcycle.Move(3);
+                    break;
+                case Keys.Left:
+                    this.motorcycle.Move(1);
+                    break;
+                case Keys.Right:
+                    this.motorcycle.Move(0);
+                    break;
+            }
+        }
 
-            // Configuración del botón
-            this.button1.Location = new System.Drawing.Point(100, 100);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(100, 50);
-            this.button1.Text = "Haz clic aquí";
-            this.button1.Click += new EventHandler(this.button1_Click);
-
-
+        private void InitializeComponent_1()
+        {
+            // Inicializar PictureBox
             this.pictureBox1 = new PictureBox();
-
-            // Configuración del PictureBox
-            this.pictureBox1.Location = new System.Drawing.Point(50, 50);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(80, 80);
-            this.pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.Image = Image.FromFile("Imagenes/jugador/moto_jugador_abajo.png"); // Cambia "tuImagen.png" por el nombre de tu archivo de imagen
-
-
-            // Configuración del cuadro de texto
-            this.textBox1.Location = new System.Drawing.Point(100, 50);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(200, 20);
-
-            // Agregar controles al formulario
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.pictureBox1);
 
+            // Crear la instancia de Motorcycle
+            string[] images_player = new string[]
+            {
+                "Imagenes/jugador/moto_jugador_derecha.png",
+                "Imagenes/jugador/moto_jugador_izquierda.png",
+                "Imagenes/jugador/moto_jugador_arriba.png",
+                "Imagenes/jugador/moto_jugador_abajo.png"
+            };
+
+            this.motorcycle = new Motorcycle(5, 5, 4, images_player, this.pictureBox1);
+
+
             // Configuración del formulario
-            this.ClientSize = new System.Drawing.Size(800, 800);
+            this.ClientSize = new System.Drawing.Size(1400, 800); //1200 pixeles dedicated to the large and 200 extra to show items and powerups info
+            //tallness of 800 dedicated to game.
             this.Name = "Form1";
             this.Text = "Mi Proyecto WinForms";
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("¡Hola, " + textBox1.Text + "!");
-        }
     }
 }
-

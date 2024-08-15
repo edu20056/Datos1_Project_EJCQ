@@ -12,3 +12,18 @@ C:\Users\ejcan\Desktop\U\II SEM 2024\Datos1\Proyecto1\Windows Forms Attempt\obj\
 C:\Users\ejcan\Desktop\U\II SEM 2024\Datos1\Proyecto1\Windows Forms Attempt\obj\Debug\net8.0-windows\Windows Forms Attempt.pdb
 C:\Users\ejcan\Desktop\U\II SEM 2024\Datos1\Proyecto1\Windows Forms Attempt\obj\Debug\net8.0-windows\Windows Forms Attempt.genruntimeconfig.cache
 C:\Users\ejcan\Desktop\U\II SEM 2024\Datos1\Proyecto1\Windows Forms Attempt\obj\Debug\net8.0-windows\ref\Windows Forms Attempt.dll
+C:\Users\ejcan\Desktop\U\FSC\Proyecto 2\Datos1_Project_EJCQ\bin\Debug\net8.0-windows\Windows Forms Attempt.exe
+C:\Users\ejcan\Desktop\U\FSC\Proyecto 2\Datos1_Project_EJCQ\bin\Debug\net8.0-windows\Windows Forms Attempt.deps.json
+C:\Users\ejcan\Desktop\U\FSC\Proyecto 2\Datos1_Project_EJCQ\bin\Debug\net8.0-windows\Windows Forms Attempt.runtimeconfig.json
+C:\Users\ejcan\Desktop\U\FSC\Proyecto 2\Datos1_Project_EJCQ\bin\Debug\net8.0-windows\Windows Forms Attempt.dll
+C:\Users\ejcan\Desktop\U\FSC\Proyecto 2\Datos1_Project_EJCQ\bin\Debug\net8.0-windows\Windows Forms Attempt.pdb
+C:\Users\ejcan\Desktop\U\FSC\Proyecto 2\Datos1_Project_EJCQ\obj\Debug\net8.0-windows\Windows Forms Attempt.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ejcan\Desktop\U\FSC\Proyecto 2\Datos1_Project_EJCQ\obj\Debug\net8.0-windows\Windows Forms Attempt.AssemblyInfoInputs.cache
+C:\Users\ejcan\Desktop\U\FSC\Proyecto 2\Datos1_Project_EJCQ\obj\Debug\net8.0-windows\Windows Forms Attempt.AssemblyInfo.cs
+C:\Users\ejcan\Desktop\U\FSC\Proyecto 2\Datos1_Project_EJCQ\obj\Debug\net8.0-windows\Windows Forms Attempt.csproj.CoreCompileInputs.cache
+C:\Users\ejcan\Desktop\U\FSC\Proyecto 2\Datos1_Project_EJCQ\obj\Debug\net8.0-windows\Windows Forms Attempt.sourcelink.json
+C:\Users\ejcan\Desktop\U\FSC\Proyecto 2\Datos1_Project_EJCQ\obj\Debug\net8.0-windows\Windows Forms Attempt.dll
+C:\Users\ejcan\Desktop\U\FSC\Proyecto 2\Datos1_Project_EJCQ\obj\Debug\net8.0-windows\refint\Windows Forms Attempt.dll
+C:\Users\ejcan\Desktop\U\FSC\Proyecto 2\Datos1_Project_EJCQ\obj\Debug\net8.0-windows\Windows Forms Attempt.pdb
+C:\Users\ejcan\Desktop\U\FSC\Proyecto 2\Datos1_Project_EJCQ\obj\Debug\net8.0-windows\Windows Forms Attempt.genruntimeconfig.cache
+C:\Users\ejcan\Desktop\U\FSC\Proyecto 2\Datos1_Project_EJCQ\obj\Debug\net8.0-windows\ref\Windows Forms Attempt.dll

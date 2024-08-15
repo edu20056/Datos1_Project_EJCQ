@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ejcan\\Desktop\\U\\II SEM 2024\\Datos1\\Proyecto1\\Windows Forms Attempt\\Windows Forms Attempt.csproj": {}
+    "C:\\Users\\ejcan\\Desktop\\U\\FSC\\Proyecto 2\\Datos1_Project_EJCQ\\Windows Forms Attempt.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ejcan\\Desktop\\U\\II SEM 2024\\Datos1\\Proyecto1\\Windows Forms Attempt\\Windows Forms Attempt.csproj": {
+    "C:\\Users\\ejcan\\Desktop\\U\\FSC\\Proyecto 2\\Datos1_Project_EJCQ\\Windows Forms Attempt.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ejcan\\Desktop\\U\\II SEM 2024\\Datos1\\Proyecto1\\Windows Forms Attempt\\Windows Forms Attempt.csproj",
+        "projectUniqueName": "C:\\Users\\ejcan\\Desktop\\U\\FSC\\Proyecto 2\\Datos1_Project_EJCQ\\Windows Forms Attempt.csproj",
         "projectName": "Windows Forms Attempt",
-        "projectPath": "C:\\Users\\ejcan\\Desktop\\U\\II SEM 2024\\Datos1\\Proyecto1\\Windows Forms Attempt\\Windows Forms Attempt.csproj",
+        "projectPath": "C:\\Users\\ejcan\\Desktop\\U\\FSC\\Proyecto 2\\Datos1_Project_EJCQ\\Windows Forms Attempt.csproj",
         "packagesPath": "C:\\Users\\ejcan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ejcan\\Desktop\\U\\II SEM 2024\\Datos1\\Proyecto1\\Windows Forms Attempt\\obj\\",
+        "outputPath": "C:\\Users\\ejcan\\Desktop\\U\\FSC\\Proyecto 2\\Datos1_Project_EJCQ\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
