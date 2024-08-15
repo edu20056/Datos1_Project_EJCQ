@@ -14,19 +14,68 @@ namespace Windows_Forms_Attempt
         private System.Windows.Forms.Timer timer;
         private int executionsPerSecond;
 
+        // UI Controls for Speed Adjustment
+        private TextBox speedTextBox;
+        private Button updateSpeedButton;
+
         public Form1()
         {
-            executionsPerSecond = 3;
             InitializeComponent_1();
             CreateGridDisplay();
 
+            executionsPerSecond = 3; // Default executions per second
+
             timer = new System.Windows.Forms.Timer();
-            timer.Interval = 1000 / executionsPerSecond; // Interval in milliseconds for X executions per second
+            UpdateTimerInterval(); // Initialize the timer interval
             timer.Tick += new EventHandler(OnTimedEvent);
             timer.Start();
 
             this.KeyPreview = true;
             this.KeyDown += new KeyEventHandler(Movement);
+
+            // Initialize and add UI controls for speed adjustment
+            InitializeSpeedControls();
+        }
+
+        private void InitializeSpeedControls()
+        {
+            // Initialize the TextBox
+            speedTextBox = new TextBox();
+            speedTextBox.Location = new Point(1200, 200);
+            speedTextBox.Size = new Size(100, 20);
+            this.Controls.Add(speedTextBox);
+
+            // Initialize the Button
+            updateSpeedButton = new Button();
+            updateSpeedButton.Text = "Update Speed";
+            updateSpeedButton.Location = new Point(1200, 500);
+            updateSpeedButton.Click += new EventHandler(UpdateSpeedButton_Click);
+            this.Controls.Add(updateSpeedButton);
+        }
+
+        private void UpdateSpeedButton_Click(object sender, EventArgs e)
+        {
+            // Update motorcycle speed and timer interval based on the value in the TextBox
+            int newSpeed;
+            if (int.TryParse(speedTextBox.Text, out newSpeed) && newSpeed > 0)
+            {
+                this.motorcycle.SetSpeed(newSpeed);
+                executionsPerSecond = newSpeed; // Use the new speed as the execution rate
+
+                UpdateTimerInterval(); // Update the timer interval based on the new speed
+            }
+            else
+            {
+                MessageBox.Show("Please enter a valid positive integer.");
+            }
+        }
+
+        private void UpdateTimerInterval()
+        {
+            if (executionsPerSecond > 0)
+            {
+                timer.Interval = 1000 / executionsPerSecond; // Update interval to match new speed
+            }
         }
 
         private void OnTimedEvent(object sender, EventArgs e)

@@ -15,7 +15,7 @@ namespace Windows_Forms_Attempt
 
         private int x;
         private int y;
-        private int move_indicator; // This variable tells if the motorcycle must move up, down, right or left.
+        private int move_indicator;
 
         public Motorcycle(int speed, int stels, int fuel, string[] list_images, PictureBox box, int move_indicator)
         {
@@ -30,9 +30,12 @@ namespace Windows_Forms_Attempt
             Create_Box(); // Configure the PictureBox inside the Motorcycle class
         }
 
-        public int Get_speed()
+        public void SetSpeed(int newSpeed)
         {
-            return this.speed;
+            if (newSpeed > 0)
+            {
+                this.speed = newSpeed;
+            }
         }
 
         public void Create_Box()
@@ -64,64 +67,35 @@ namespace Windows_Forms_Attempt
 
         public void Change_Position(List<ArrayGrid.Node> list)
         {
-            // Buscar el nodo actual de la motocicleta en la lista de nodos
             ArrayGrid.Node current = list.Find(node => node.GetX() == this.x && node.GetY() == this.y);
 
             if (current == null)
             {
-                // Si no se encuentra el nodo actual, salir del método
                 Console.WriteLine("No se encontró el nodo actual.");
                 return;
             }
 
-            // Verificar la dirección de movimiento
-            if (this.move_indicator == 1) // Mover hacia la derecha
+            switch (this.move_indicator)
             {
-                current = current.right;
-
-                if (current != null)
-                {
-                    // Actualizar la posición de la motocicleta
-                    this.x = current.GetX();
-                    this.y = current.GetY();
-                    this.box.Location = new System.Drawing.Point(current.GetX() * 50, current.GetY() * 50);
-                }
+                case 1: // Right
+                    current = current.right;
+                    break;
+                case 2: // Up
+                    current = current.up;
+                    break;
+                case 3: // Left
+                    current = current.left;
+                    break;
+                case 4: // Down
+                    current = current.down;
+                    break;
             }
-            else if (this.move_indicator == 2) // Mover hacia arriba
-            {
-                current = current.up;
 
-                if (current != null)
-                {
-                    // Actualizar la posición de la motocicleta
-                    this.x = current.GetX();
-                    this.y = current.GetY();
-                    this.box.Location = new System.Drawing.Point(current.GetX() * 50, current.GetY() * 50);
-                }
-            }
-            else if (this.move_indicator == 3) // Mover hacia la izquierda
+            if (current != null)
             {
-                current = current.left;
-
-                if (current != null)
-                {
-                    // Actualizar la posición de la motocicleta
-                    this.x = current.GetX();
-                    this.y = current.GetY();
-                    this.box.Location = new System.Drawing.Point(current.GetX() * 50, current.GetY() * 50);
-                }
-            }
-            else if (this.move_indicator == 4) // Mover hacia abajo
-            {
-                current = current.down;
-
-                if (current != null)
-                {
-                    // Actualizar la posición de la motocicleta
-                    this.x = current.GetX();
-                    this.y = current.GetY();
-                    this.box.Location = new System.Drawing.Point(current.GetX() * 50, current.GetY() * 50);
-                }
+                this.x = current.GetX();
+                this.y = current.GetY();
+                this.box.Location = new System.Drawing.Point(current.GetX() * 50, current.GetY() * 50);
             }
         }
     }
