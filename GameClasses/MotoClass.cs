@@ -36,5 +36,7 @@ namespace Windows_Forms_Attempt
             string new_image = list_images[index_image];
             this.box.Image = System.Drawing.Image.FromFile(new_image);
         }
+
+        
     }
 }
