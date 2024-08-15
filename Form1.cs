@@ -69,16 +69,16 @@ namespace Windows_Forms_Attempt
             switch (e.KeyCode)
             {
                 case Keys.Up:
-                    this.motorcycle.Move(2);
+                    this.motorcycle.Move_Image(2);
                     break;
                 case Keys.Down:
-                    this.motorcycle.Move(3);
+                    this.motorcycle.Move_Image(3);
                     break;
                 case Keys.Left:
-                    this.motorcycle.Move(1);
+                    this.motorcycle.Move_Image(1);
                     break;
                 case Keys.Right:
-                    this.motorcycle.Move(0);
+                    this.motorcycle.Move_Image(0);
                     break;
             }
         }

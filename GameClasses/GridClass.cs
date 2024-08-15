@@ -1,11 +1,8 @@
-using System.Collections.Generic;
-using System.Windows.Forms;
-
 namespace Windows_Forms_Attempt
 {
     public class ArrayGrid
     {
-        public class Node
+        public class Node 
         {
             public int value;
             public int x_pos;
@@ -40,70 +37,115 @@ namespace Windows_Forms_Attempt
             }
         }
 
-        private List<Node> list_nodes;
+        private Node head;
 
-        public ArrayGrid(int x_size, int y_size)
+        private int x_size = 24;
+        private int y_size = 16;
+        List<Node> list_nodes = new List<Node>(); 
+        public ArrayGrid(int x_size, int y_size) 
         {
-            list_nodes = new List<Node>();
-            Create_Grid(x_size, y_size);
+            this.head = head;
+            this.x_size = x_size;
+            this.y_size = y_size;
         }
 
-        private void Create_Grid(int x_size, int y_size)
+        public void Create_Grid()
         {
-            for (int y = 0; y < y_size; y++)
+            int x = 1;
+            int y = 0;
+            
+            //creacion de nodos
+            Node head = new Node(0, 0, 0);
+            list_nodes.Add(head);
+            while (y < y_size)
             {
-                for (int x = 0; x < x_size; x++)
+                while (x < x_size)
                 {
-                    Node node = new Node(0, x, y);
+                    Node node =  new Node(0, x, y);
+                    x++;
                     list_nodes.Add(node);
                 }
+                x = 0;
+                y++;
             }
-
+            //link de nodos
             foreach (Node node in list_nodes)
             {
-                node.right = Search_right_node(node.GetX() + 1, node.GetY());
-                node.left = Search_left_node(node.GetX() - 1, node.GetY());
-                node.up = Search_up_node(node.GetX(), node.GetY() - 1);
-                node.down = Search_down_node(node.GetX(), node.GetY() + 1);
+                node.right = Search_right_node(node.GetX() + 1, node.GetY(), list_nodes );
+                node.left = Search_left_node(node.GetX() - 1, node.GetY(), list_nodes );
+                node.up = Search_up_node(node.GetX(), node.GetY() - 1, list_nodes );
+                node.down = Search_down_node(node.GetX(), node.GetY() + 1, list_nodes );
             }
+
         }
 
-        private Node Search_right_node(int x, int y)
+        private Node Search_right_node(int x, int y, List<Node> lista)
         {
-            if (x >= 24)
+            if (x > 23)
             {
                 x = 0;
             }
-            return list_nodes.Find(node => node.GetX() == x && node.GetY() == y);
+
+            foreach (Node node in lista)
+            {
+                if ( x == node.GetX() && y == node.GetY())
+                {
+                    return node;
+                }
+            }
+            return null;
         }
 
-        private Node Search_left_node(int x, int y)
+        private Node Search_left_node(int x, int y, List<Node> lista)
         {
             if (x < 0)
             {
                 x = 23;
             }
-            return list_nodes.Find(node => node.GetX() == x && node.GetY() == y);
+
+            foreach (Node node in lista)
+            {
+                if ( x == node.GetX() && y == node.GetY())
+                {
+                    return node;
+                }
+            }
+            return null;
         }
 
-        private Node Search_up_node(int x, int y)
+        private Node Search_up_node(int x, int y, List<Node> lista)
         {
             if (y < 0)
             {
                 y = 15;
             }
-            return list_nodes.Find(node => node.GetX() == x && node.GetY() == y);
+
+            foreach (Node node in lista)
+            {
+                if ( x == node.GetX() && y == node.GetY())
+                {
+                    return node;
+                }
+            }
+            return null;
         }
 
-        private Node Search_down_node(int x, int y)
+        private Node Search_down_node(int x, int y, List<Node> lista)
         {
-            if (y >= 16)
+            if (y > 15)
             {
                 y = 0;
             }
-            return list_nodes.Find(node => node.GetX() == x && node.GetY() == y);
-        }
 
+            foreach (Node node in lista)
+            {
+                if ( x == node.GetX() && y == node.GetY())
+                {
+                    return node;
+                }
+            }
+            return null;
+        }
         public List<Node> GetNodes()
         {
             return list_nodes;

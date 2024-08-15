@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Windows Forms Attempt")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+28b3bd10bf3119c29c4171464b88dc42d9a15764")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0a0962e0d3ba657ca33581ccbbbf4d06b862b742")]
 [assembly: System.Reflection.AssemblyProductAttribute("Windows Forms Attempt")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Windows Forms Attempt")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

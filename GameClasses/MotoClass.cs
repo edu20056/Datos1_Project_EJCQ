@@ -22,7 +22,7 @@ namespace Windows_Forms_Attempt
         {
             if (this.box != null)
             {
-                this.box.Location = new System.Drawing.Point(100, 100);
+                this.box.Location = new System.Drawing.Point(0, 0);
                 this.box.Name = "pictureBox1";
                 this.box.Size = new System.Drawing.Size(50, 50);
                 this.box.SizeMode = PictureBoxSizeMode.StretchImage;
@@ -31,12 +31,16 @@ namespace Windows_Forms_Attempt
             }
         }
 
-        public void Move(int index_image)
+        public void Move_Image(int index_image)
         {
             string new_image = list_images[index_image];
             this.box.Image = System.Drawing.Image.FromFile(new_image);
         }
 
+        public void Change_Position(int x, int y)
+        {
+            this.box.Location = new System.Drawing.Point(x, y);
+        }
         
     }
 }
