@@ -1,0 +1,24 @@
+Sobre el main Character:
+    -Hace falta la implementación de lista de powerups e ítemes.
+    -Hace falta las imágenes de estelas (Agregar moto como lista enlazada simple).
+
+Sobre los bots:
+    -implementación de clase
+    -powerups e ítemes
+    -Hace falta las imágenes de estelas (Agregar moto como lista enlazada simple).
+
+COLISIONES entre bots y main Character.
+
+Tipos de powerups:
+    -Spawm de powerups (pila).
+    -Lógica de ordenamiento.   
+        -escudo. 
+        -Speed bust
+        -estelas add
+
+Tipo de ítmes:
+    -Spawm de items (cola)
+    -Delay de 1 segundo entre uso de itemes
+        -combustible.
+        -crecimiento de estelas.
+        -bombas.
