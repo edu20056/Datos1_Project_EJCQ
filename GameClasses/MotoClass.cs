@@ -15,7 +15,7 @@ namespace Windows_Forms_Attempt
 
         private int x;
         private int y;
-        private int move_indicator;
+        private int move_indicator; // Indicates numbers form 1 to 4, which are related to movement.
 
         public Motorcycle(int speed, int stels, int fuel, string[] list_images, PictureBox box, int move_indicator)
         {
@@ -36,6 +36,16 @@ namespace Windows_Forms_Attempt
             {
                 this.speed = newSpeed;
             }
+        }
+
+        public int Get_fuel()
+        {
+            return this.fuel;
+        }
+
+        public void Set_fuel(int new_fuel)
+        {
+            this.fuel = new_fuel;
         }
 
         public void Create_Box()

@@ -18,12 +18,17 @@ namespace Windows_Forms_Attempt
         private TextBox speedTextBox;
         private Button updateSpeedButton;
 
+        private TextBox current_fuel;
+
+        private int rest_fuel;
+
         public Form1()
         {
             InitializeComponent_1();
             CreateGridDisplay();
 
-            executionsPerSecond = 3; // Default executions per second
+            rest_fuel = 0;
+            executionsPerSecond = 3; // Default executions per second, it represents the speed.
 
             timer = new System.Windows.Forms.Timer();
             UpdateTimerInterval(); // Initialize the timer interval
@@ -39,7 +44,10 @@ namespace Windows_Forms_Attempt
 
         private void InitializeSpeedControls()
         {
-            // Initialize the TextBox
+            
+            int fuel = this.motorcycle.Get_fuel();
+
+            // Initialize the TextBox for changing speed
             speedTextBox = new TextBox();
             speedTextBox.Location = new Point(1200, 200);
             speedTextBox.Size = new Size(100, 20);
@@ -51,6 +59,15 @@ namespace Windows_Forms_Attempt
             updateSpeedButton.Location = new Point(1200, 500);
             updateSpeedButton.Click += new EventHandler(UpdateSpeedButton_Click);
             this.Controls.Add(updateSpeedButton);
+
+            
+            // Configure the message box
+            this.current_fuel = new TextBox();
+            current_fuel.ReadOnly = true;
+            current_fuel.Text = "The current fue is " + fuel + ".";
+            current_fuel.Size = new Size(150,50);
+            current_fuel.Location = new System.Drawing.Point(1200,650);
+            this.Controls.Add(current_fuel);
         }
 
         private void UpdateSpeedButton_Click(object sender, EventArgs e)
@@ -82,6 +99,28 @@ namespace Windows_Forms_Attempt
         {
             // Move the motorcycle automatically
             this.motorcycle.Change_Position(nodes);
+            int fuel = this.motorcycle.Get_fuel();
+            if (fuel > 0)
+            {
+                if (rest_fuel == 3) //This means that, this line will be called 3 times, the motorcycle will move 3 blocks and only then loss 1 in fuel
+                {
+                    fuel--;
+                    this.motorcycle.Set_fuel(fuel);
+                    current_fuel.Text = "The current fue is " + fuel + ".";
+                    rest_fuel = 0;
+                }
+
+                else
+                {
+                    rest_fuel++;
+                }
+            }
+            else
+            {
+                timer.Stop();
+                MessageBox.Show("Game Over");
+            }
+           
         }
 
         private void Movement(object sender, KeyEventArgs e)
@@ -130,7 +169,16 @@ namespace Windows_Forms_Attempt
                 "Imagenes/jugador/moto_jugador_abajo.png"
             };
 
-            this.motorcycle = new Motorcycle(executionsPerSecond, 5, 4, images_player, this.pictureBox1, 1);
+
+            string[] images_bots = new string[]
+            {
+                "Imagenes/bots/moto_bot_derecha.png",
+                "Imagenes/bots/moto_bot_arriba.png",
+                "Imagenes/bots/moto_bot_izquierda.png",
+                "Imagenes/bots/moto_bot_abajo.png"
+            };
+
+            this.motorcycle = new Motorcycle(executionsPerSecond, 3, 3, images_player, this.pictureBox1, 1);
         }
 
         private void CreateGridDisplay()
