@@ -8,55 +8,98 @@ namespace Windows_Forms_Attempt
     public partial class Form1 : Form
     {
         private PictureBox pictureBox1; //Box for player
-        private Motorcycle motorcycle;
-        private MotorcycleBot bot;
-        private MotorcycleBot bot1;
-        private MotorcycleBot bot2;
-        private MotorcycleBot bot3;
-        private MotorcycleBot bot4;
-        private ArrayGrid grid;
-
+        private Motorcycle motorcycle; //Players object
+        private MotorcycleBot bot; //generic objecto for creating list of the bots
+        private ArrayGrid grid; //Object grid for representing the map and leading to the movement of bots and player
         private List<MotorcycleBot> list_bots;
         private List<ArrayGrid.Node> nodes;
-        private System.Windows.Forms.Timer timer;
+        private System.Windows.Forms.Timer timer_player;
+        private System.Windows.Forms.Timer timer_bot1;
+        private System.Windows.Forms.Timer timer_bot2;
+        private System.Windows.Forms.Timer timer_bot3;
+        private System.Windows.Forms.Timer timer_bot4;
         private int executionsPerSecond;
-
-        // UI Controls for Speed Adjustment
         private TextBox speedTextBox;
         private Button updateSpeedButton;
-
         private Button quit_Button;
-
         private TextBox current_fuel;
-
         private int rest_fuel;
-
+        private Random random = new Random();
+        private List<int> lista_actual_move_bots = new List<int>();
+        private List<int> bots_random_distance = new List<int>();
         public Form1()
         {
             InitializeComponent_1();
             CreateGridDisplay();
+            for (int i = 0; i < 4; i++)
+            {
+                lista_actual_move_bots.Add(0);
+            }
 
+            for (int i = 0; i < 4; i++)
+            {
+                bots_random_distance.Add(0);
+            }
             rest_fuel = 0;
             executionsPerSecond = 3; // Default executions per second, it represents the speed.
 
-            timer = new System.Windows.Forms.Timer();
-            UpdateTimerInterval(); // Initialize the timer interval
-            timer.Tick += new EventHandler(Fuel_Check);
-            timer.Start();
+            timer_player = new System.Windows.Forms.Timer();
+            UpdateTimerInterval(); //timer.Interval = 333; 
+            timer_player.Tick += new EventHandler(Fuel_Check);
+            timer_player.Start();
 
+            timer_bot1 = new System.Windows.Forms.Timer();
+            timer_bot1.Interval = 400;
+            timer_bot1.Tick += (sender, e) => Set_bots_movement(sender, e, 0); 
+            timer_bot1.Start();
+            
+            timer_bot2 = new System.Windows.Forms.Timer();
+            timer_bot2.Interval = 400;
+            timer_bot2.Tick += (sender, e) => Set_bots_movement(sender, e, 1); 
+            timer_bot2.Start();
+
+            timer_bot3 = new System.Windows.Forms.Timer();
+            timer_bot3.Interval = 400;
+            timer_bot3.Tick += (sender, e) => Set_bots_movement(sender, e, 2); 
+            timer_bot3.Start();
+            
+            timer_bot4 = new System.Windows.Forms.Timer();
+            timer_bot4.Interval = 400;
+            timer_bot4.Tick += (sender, e) => Set_bots_movement(sender, e, 3); 
+            timer_bot4.Start();
+            
             this.KeyPreview = true;
             this.KeyDown += new KeyEventHandler(Movement);
 
-            // Initialize and add UI controls for speed adjustment
             InitializeControls();
         }
-
-        public void Set_bots_movement()
-        {
-            foreach (MotorcycleBot bot in list_bots)
+        public void Set_bots_movement(object sender, EventArgs e, int k)
+         {
+            bot = list_bots[k];
+            if (lista_actual_move_bots[k] == 0)
             {
-                 
+                int move = random.Next(3, 7);
+                bots_random_distance[k] = move;
+                int actual_dir = bot.Current_Image_Direction();
+                int direction;
+
+                do
+                {
+                    direction = random.Next(0, 4);
+                } while (direction == (actual_dir + 2) % 4); // Avoid moving directly backwards
+
+                bot.Move_Image(direction);
             }
+            else if (lista_actual_move_bots[k] == bots_random_distance[k] )
+            {
+                lista_actual_move_bots[k] = 0;
+            }
+            else
+            {
+                lista_actual_move_bots[k]++;
+            }
+            
+            bot.Change_Position(nodes);
         }
         private void InitializeControls() // Initialize all textboxes and buttons
         {
@@ -117,7 +160,7 @@ namespace Windows_Forms_Attempt
         {
             if (executionsPerSecond > 0)
             {
-                timer.Interval = 1000 / executionsPerSecond; // Update interval to match new speed
+                timer_player.Interval = 1000 / executionsPerSecond; // Update interval to match new speed
             }
         }
 
@@ -143,10 +186,9 @@ namespace Windows_Forms_Attempt
             }
             else
             {
-                timer.Stop();
+                timer_player.Stop();
                 MessageBox.Show("Game Over");
             }
-           
         }
 
         private void Movement(object sender, KeyEventArgs e) //if any key is pressed, changes players direction
@@ -186,11 +228,7 @@ namespace Windows_Forms_Attempt
             this.pictureBox1.BackColor = Color.Transparent; // No background color
             this.Controls.Add(this.pictureBox1);
 
-            list_bots = new List<MotorcycleBot>();
-            list_bots.Add(bot1);
-            list_bots.Add(bot2);
-            list_bots.Add(bot3);
-            list_bots.Add(bot4);
+            list_bots = new List<MotorcycleBot>(); // List of bots for future iterating them
 
             List<PictureBox> box_list_bots = new List<PictureBox>();
 
@@ -225,13 +263,13 @@ namespace Windows_Forms_Attempt
                 "Imagenes/bots/moto_bot_abajo.png"
             };
 
-            this.motorcycle = new Motorcycle(executionsPerSecond, 3, 10, images_player, this.pictureBox1, 1);
+            this.motorcycle = new Motorcycle(executionsPerSecond, 3, 100, images_player, this.pictureBox1, 1);
 
             for (int k = 0; k < 4; k++)
             {
-                MotorcycleBot bot = list_bots[k];
-                PictureBox box_grid = box_list_bots[k]; 
-                this.bot = new MotorcycleBot(3,3, images_bots, box_grid, 2*k, 7*k, 1);
+                PictureBox box_grid = box_list_bots[k];
+                MotorcycleBot bot = new MotorcycleBot(3, 3, images_bots, box_grid, 5 * k, 7 * k, 1);
+                list_bots.Add(bot);
             }
         }
 

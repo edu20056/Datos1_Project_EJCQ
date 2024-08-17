@@ -38,7 +38,7 @@ namespace Windows_Forms_Attempt
                 this.box.Name = "Bot";
                 this.box.Size = new System.Drawing.Size(50, 50);
                 this.box.SizeMode = PictureBoxSizeMode.StretchImage;
-                this.box.Image = System.Drawing.Image.FromFile(list_images[0]);
+                this.box.Image = System.Drawing.Image.FromFile(list_images[move_indicator]);
                 this.box.BackColor = Color.Transparent; // Ensure no background color
             }
         }
@@ -46,7 +46,13 @@ namespace Windows_Forms_Attempt
         public void Move_Image(int index_image)
         {
             string new_image = list_images[index_image];
+            this.move_indicator = index_image;
             this.box.Image = System.Drawing.Image.FromFile(new_image);
+        }
+
+        public int Current_Image_Direction()
+        {
+            return this.move_indicator;
         }
 
         public void Change_Position(List<ArrayGrid.Node> list)
@@ -61,16 +67,16 @@ namespace Windows_Forms_Attempt
 
             switch (this.move_indicator)
             {
-                case 1: // Right
+                case 0: // Right
                     current = current.right;
                     break;
-                case 2: // Up
+                case 1: // Up
                     current = current.up;
                     break;
-                case 3: // Left
+                case 2: // Left
                     current = current.left;
                     break;
-                case 4: // Down
+                case 3: // Down
                     current = current.down;
                     break;
             }
