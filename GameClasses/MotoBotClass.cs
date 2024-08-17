@@ -11,7 +11,7 @@ namespace Windows_Forms_Attempt
         private int y;
         private int move_indicator;
 
-        public MotorcycleBot(int speed, int stels, string[] list_images, PictureBox box, int x, int y)
+        public MotorcycleBot(int speed, int stels, string[] list_images, PictureBox box, int x, int y, int move_indicator)
         {
             this.speed = speed;
             this.stels = stels;
@@ -19,6 +19,7 @@ namespace Windows_Forms_Attempt
             this.box = box;
             this.x = y;
             this.y = x;
+            this.move_indicator = move_indicator;
             Create_Box();
         }
 
@@ -46,6 +47,40 @@ namespace Windows_Forms_Attempt
         {
             string new_image = list_images[index_image];
             this.box.Image = System.Drawing.Image.FromFile(new_image);
+        }
+
+        public void Change_Position(List<ArrayGrid.Node> list)
+        {
+            ArrayGrid.Node current = list.Find(node => node.GetX() == this.x && node.GetY() == this.y);
+
+            if (current == null)
+            {
+                Console.WriteLine("No se encontró el nodo actual.");
+                return;
+            }
+
+            switch (this.move_indicator)
+            {
+                case 1: // Right
+                    current = current.right;
+                    break;
+                case 2: // Up
+                    current = current.up;
+                    break;
+                case 3: // Left
+                    current = current.left;
+                    break;
+                case 4: // Down
+                    current = current.down;
+                    break;
+            }
+
+            if (current != null) // Place the player on the grid
+            {
+                this.x = current.GetX();
+                this.y = current.GetY();
+                this.box.Location = new System.Drawing.Point(current.GetX() * 50, current.GetY() * 50);
+            }
         }
     }
 }

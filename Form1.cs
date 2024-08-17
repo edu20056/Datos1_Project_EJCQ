@@ -15,6 +15,8 @@ namespace Windows_Forms_Attempt
         private MotorcycleBot bot3;
         private MotorcycleBot bot4;
         private ArrayGrid grid;
+
+        private List<MotorcycleBot> list_bots;
         private List<ArrayGrid.Node> nodes;
         private System.Windows.Forms.Timer timer;
         private int executionsPerSecond;
@@ -49,6 +51,13 @@ namespace Windows_Forms_Attempt
             InitializeControls();
         }
 
+        public void Set_bots_movement()
+        {
+            foreach (MotorcycleBot bot in list_bots)
+            {
+                 
+            }
+        }
         private void InitializeControls() // Initialize all textboxes and buttons
         {
             
@@ -177,7 +186,7 @@ namespace Windows_Forms_Attempt
             this.pictureBox1.BackColor = Color.Transparent; // No background color
             this.Controls.Add(this.pictureBox1);
 
-            List<MotorcycleBot> list_bots = new List<MotorcycleBot>();
+            list_bots = new List<MotorcycleBot>();
             list_bots.Add(bot1);
             list_bots.Add(bot2);
             list_bots.Add(bot3);
@@ -222,7 +231,7 @@ namespace Windows_Forms_Attempt
             {
                 MotorcycleBot bot = list_bots[k];
                 PictureBox box_grid = box_list_bots[k]; 
-                this.bot = new MotorcycleBot(3,3, images_bots, box_grid, 7*k, 7*k);
+                this.bot = new MotorcycleBot(3,3, images_bots, box_grid, 2*k, 7*k, 1);
             }
         }
 
