@@ -3,7 +3,6 @@ Sobre el main Character:
     -Hace falta las imágenes de estelas (Agregar moto como lista enlazada simple).
 
 Sobre los bots:
-    -implementación de clase
     -powerups e ítemes
     -Hace falta las imágenes de estelas (Agregar moto como lista enlazada simple).
 
