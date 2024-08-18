@@ -1,6 +1,5 @@
 Sobre el main Character:
     -Hace falta la implementación de lista de powerups e ítemes.
-    -Hace falta las imágenes de estelas (Agregar moto como lista enlazada simple).
 
 Sobre los bots:
     -powerups e ítemes

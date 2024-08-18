@@ -1,3 +1,5 @@
+using System.Windows.Forms.VisualStyles;
+
 namespace Windows_Forms_Attempt
 {
     public class MotorcycleBot
@@ -50,6 +52,15 @@ namespace Windows_Forms_Attempt
             this.box.Image = System.Drawing.Image.FromFile(new_image);
         }
 
+        public int Get_x_bot()
+        {
+            return this.x;
+        }
+
+        public int Get_y_bot()
+        {
+            return this.y;
+        }
         public int Current_Image_Direction()
         {
             return this.move_indicator;

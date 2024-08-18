@@ -25,7 +25,7 @@ namespace Windows_Forms_Attempt
             this.list_images = list_images;
             this.box = box;
             this.move_indicator = move_indicator;
-            this.x = 0;
+            this.x = 2;
             this.y = 0;
             Create_Box(); // Configure the PictureBox inside the Motorcycle class
         }
@@ -47,7 +47,20 @@ namespace Windows_Forms_Attempt
         {
             this.fuel = new_fuel;
         }
+        public int Get_x_player()
+        {
+            return this.x;
+        }
 
+        public int Get_Move_Indicator()
+        {
+            return this.move_indicator;
+        }
+
+        public int Get_y_player()
+        {
+            return this.y;
+        }
         public void Create_Box()
         {
             if (this.box != null)

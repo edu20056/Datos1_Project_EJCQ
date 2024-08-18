@@ -9,6 +9,7 @@ namespace Windows_Forms_Attempt
     {
         private PictureBox pictureBox1; //Box for player
         private Motorcycle motorcycle; //Players object
+        private DoubleLinkedForGame player;
         private MotorcycleBot bot; //generic objecto for creating list of the bots
         private ArrayGrid grid; //Object grid for representing the map and leading to the movement of bots and player
         private List<MotorcycleBot> list_bots;
@@ -40,6 +41,7 @@ namespace Windows_Forms_Attempt
             {
                 bots_random_distance.Add(0);
             }
+
             rest_fuel = 0;
             executionsPerSecond = 3; // Default executions per second, it represents the speed.
 
@@ -163,26 +165,27 @@ namespace Windows_Forms_Attempt
                 timer_player.Interval = 1000 / executionsPerSecond; // Update interval to match new speed
             }
         }
-
-        private void Fuel_Check(object sender, EventArgs e) //This function changes player positions and checks if players still has fuel.
+        private void Fuel_Check(object sender, EventArgs e)
         {
             // Move the motorcycle automatically
             this.motorcycle.Change_Position(nodes);
             int fuel = this.motorcycle.Get_fuel();
             if (fuel > 0)
             {
-                if (rest_fuel == 3) //This means that, this line will be called 3 times, the motorcycle will move 3 blocks and only then loss 1 in fuel
+                if (rest_fuel == 3)
                 {
                     fuel--;
                     this.motorcycle.Set_fuel(fuel);
-                    current_fuel.Text = "The current fue is " + fuel + ".";
+                    current_fuel.Text = "The current fuel is " + fuel + ".";
                     rest_fuel = 0;
                 }
-
                 else
                 {
                     rest_fuel++;
                 }
+
+                // Update positions of Estela objects
+                UpdateEstelas_Player();
             }
             else
             {
@@ -190,6 +193,29 @@ namespace Windows_Forms_Attempt
                 MessageBox.Show("Game Over");
             }
         }
+        private void UpdateEstelas_Player()
+        {
+            // Move the last estela first
+            for (int i = player.Get_Size() - 1; i > 0; i--)
+            {
+                if (player.Get(i) is Estela x && player.Get(i - 1) is Estela z)
+                {
+                    x.Set_Dirr(z.Get_Dirr()); // Set direction based on the previous estela
+
+                    // Move this estela to the position of the previous estela
+                    x.Change_Position(nodes, z.Get_X_est(), z.Get_Y_est());
+                }
+            }
+
+            // Move the first estela (index 1) to follow the motorcycle
+            if (player.Get(1) is Estela firstEstela)
+            {
+                firstEstela.Change_Position(nodes, this.motorcycle.Get_x_player(), this.motorcycle.Get_y_player());
+                firstEstela.Set_Dirr(this.motorcycle.Get_Move_Indicator());
+            }
+        }
+
+
 
         private void Movement(object sender, KeyEventArgs e) //if any key is pressed, changes players direction
         {
@@ -230,20 +256,30 @@ namespace Windows_Forms_Attempt
 
             list_bots = new List<MotorcycleBot>(); // List of bots for future iterating them
 
-            List<PictureBox> box_list_bots = new List<PictureBox>();
+            List<PictureBox> box_list_bots = new List<PictureBox>(); //List for boxes to be placed over the bots
 
+            List<PictureBox> estelas_boxes = new List<PictureBox>(); //List for boxes to be placed over the bots
+
+            //Implementación de boxes de bots
             for (int j = 0; j < 4; j++) 
             {
                 PictureBox pictureBox = new PictureBox();
                 box_list_bots.Add(pictureBox);
-            }
-            
-            foreach (PictureBox pictureBox in box_list_bots)
-            {
                 pictureBox.Size = new Size(50, 50);
-                pictureBox.BackColor = Color.Transparent; // Fondo transparente
-                this.Controls.Add(pictureBox); // Agregar al formulario
+                pictureBox.BackColor = Color.Transparent; 
+                this.Controls.Add(pictureBox); 
             }
+
+            // Implementation of boxes for stels
+            for (int j = 0; j < 12; j++) 
+            {
+                PictureBox pictureBox = new PictureBox();
+                estelas_boxes.Add(pictureBox);
+                pictureBox.Size = new Size(50, 50);
+                pictureBox.BackColor = Color.Transparent; 
+                this.Controls.Add(pictureBox); 
+            }
+
 
             // Crear la instancia de Motorcycle
             string[] images_player = new string[]
@@ -253,8 +289,6 @@ namespace Windows_Forms_Attempt
                 "Imagenes/jugador/moto_jugador_arriba.png",
                 "Imagenes/jugador/moto_jugador_abajo.png"
             };
-
-
             string[] images_bots = new string[]
             {
                 "Imagenes/bots/moto_bot_derecha.png",
@@ -263,7 +297,21 @@ namespace Windows_Forms_Attempt
                 "Imagenes/bots/moto_bot_abajo.png"
             };
 
+            player = new DoubleLinkedForGame();
             this.motorcycle = new Motorcycle(executionsPerSecond, 3, 100, images_player, this.pictureBox1, 1);
+            Estela es1_player = new Estela(estelas_boxes[0],2,0,1);
+            Estela es2_player = new Estela(estelas_boxes[1],1,0,1);
+            Estela es3_player = new Estela(estelas_boxes[2],0,0,1);
+            Estela es4_player = new Estela(estelas_boxes[3],0,0,1);
+
+
+            //Adding instances of player
+            player.Add(this.motorcycle);
+            player.Add(es1_player);
+            player.Add(es2_player);
+            player.Add(es3_player);
+            player.Add(es4_player);
+
 
             for (int k = 0; k < 4; k++)
             {
