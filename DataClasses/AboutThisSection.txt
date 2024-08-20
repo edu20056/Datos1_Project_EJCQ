@@ -1,0 +1,4 @@
+The linear data structures are based on the ones presented on the following Github repository:
+https://github.com/itcr-computer-engineering/data-structures-and-algorithms/tree/main
+Notice that the codes presented on the Github repository are coded ing Java, the ones presented in this project 
+are the same codes implemented to C#.

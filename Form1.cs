@@ -31,6 +31,7 @@ namespace Windows_Forms_Attempt
         private TextBox current_fuel;
         private int rest_fuel;
         private Random random = new Random();
+        private int killed_bot = 0;
         private List<int> lista_actual_move_bots = new List<int>(); //this is a list of integers that relate how many times has a bot moved, 
         //if it reaches a certain number, which is the index number in bots_random_distance, it will change direction and reset the integer index
         //related to that bot. Logic in Set_bots_movement().
@@ -63,7 +64,7 @@ namespace Windows_Forms_Attempt
 
             for (int i = 0; i < botCount; i++)
             {
-                int bot_speed = 10000;//random.Next(299, 401);
+                int bot_speed = random.Next(299, 401);
                 botTimers[i] = new System.Windows.Forms.Timer();
                 botTimers[i].Interval = bot_speed;
                 list_bots[i].SetSpeed(bot_speed);
@@ -93,7 +94,6 @@ namespace Windows_Forms_Attempt
                 } while (direction == (actual_dir + 2) % 4); // Avoid moving directly backwards
 
                 bot.Move_Image(direction);
-                Analice_Colisions(bot);
             }
             else if (lista_actual_move_bots[k] == bots_random_distance[k] )
             {
@@ -105,22 +105,27 @@ namespace Windows_Forms_Attempt
             }
             
             bot.Change_Position(nodes);
+
             if (k == 0)
             {
+                Analice_Colisions(bot, bot1);
                 UpdateEstelas_Bots(bot1, bot);
             }
 
             else if (k == 1)
             {
+                Analice_Colisions(bot, bot2);
                 UpdateEstelas_Bots(bot2, bot);
             }
 
             else if (k == 2)
             {
+                Analice_Colisions(bot, bot3);
                 UpdateEstelas_Bots(bot3, bot);
             }
             else
             {
+                Analice_Colisions(bot, bot4);
                 UpdateEstelas_Bots(bot4, bot);
             }
 
@@ -180,7 +185,7 @@ namespace Windows_Forms_Attempt
                 MessageBox.Show("Please enter a valid positive integer.");
             }
         }
-        private void Analice_Colisions(object ob)
+        private void Analice_Colisions(object ob, SingleLinkedForGame list)
         {
             try 
             {
@@ -209,7 +214,11 @@ namespace Windows_Forms_Attempt
                         catch
                         {
                             Estela estela = (Estela)objecto;
-                            if (estela.Get_X_est() == moto.Get_x_player() && estela.Get_Y_est() == moto.Get_y_player())
+                            if (estela == list.Get(1))
+                            {
+                                continue;
+                            }
+                            else if (estela.Get_X_est() == moto.Get_x_player() && estela.Get_Y_est() == moto.Get_y_player())
                             {
                                 timer_player.Stop();
                                 foreach (System.Windows.Forms.Timer timer in botTimers)
@@ -241,8 +250,9 @@ namespace Windows_Forms_Attempt
                         Estela estela = (Estela)objecto;
                         if (estela.Get_X_est() == bot.Get_x_bot() && estela.Get_Y_est() == bot.Get_y_bot())
                         {
-                            this.Controls.Remove(bot.Get_Box());
-                            bot.Get_Box().Dispose();
+                            botTimers[bot.Get_position_list_indicator()].Stop();
+                            killed_bot++;
+                            bot.Move_Image(4);
                         }
                     }
                     catch
@@ -250,11 +260,12 @@ namespace Windows_Forms_Attempt
                         MotorcycleBot bot_colision = (MotorcycleBot)objecto;
                         if (bot_colision.Get_x_bot() == bot.Get_x_bot() && bot_colision.Get_y_bot() == bot.Get_y_bot())
                         {
-                            this.Controls.Remove(bot.Get_Box());
-                            bot.Get_Box().Dispose();
-
-                            this.Controls.Remove(bot_colision.Get_Box());
-                            bot_colision.Get_Box().Dispose();
+                            botTimers[bot.Get_position_list_indicator()].Stop();
+                            bot.Move_Image(4);
+                            killed_bot++;
+                            botTimers[bot_colision.Get_position_list_indicator()].Stop();
+                            bot_colision.Move_Image(4);
+                            killed_bot++;
                         } 
                     }
                 }
@@ -281,7 +292,18 @@ namespace Windows_Forms_Attempt
                 firstEstela.Change_Position(nodes, bot.Get_x_bot(), bot.Get_y_bot());
             }
         }
-
+        private void Check_Killed_Bots()
+        {
+            if (killed_bot == 4)
+            {
+                timer_player.Stop();
+                foreach (System.Windows.Forms.Timer timer in botTimers)
+                {
+                    timer.Stop();
+                }
+                MessageBox.Show("Win, you managed to kill all enemies!");
+            }
+        }
         private void UpdateTimerInterval() //This function changes directly the execution per second in terms of movement. 
         {
             if (executionsPerSecond > 0)
@@ -292,8 +314,9 @@ namespace Windows_Forms_Attempt
         private void Fuel_Check(object sender, EventArgs e)
         {
             // Move the motorcycle automatically
+            Check_Killed_Bots();
             this.motorcycle.Change_Position(nodes);
-            Analice_Colisions(this.motorcycle);
+            Analice_Colisions(this.motorcycle, player);
             int fuel = this.motorcycle.Get_fuel();
             if (fuel > 0)
             {
@@ -366,7 +389,6 @@ namespace Windows_Forms_Attempt
                     break;
             }
         }
-
         private void InitializeComponent_1() //Main loop
         {
             // Configuración del formulario
@@ -418,11 +440,12 @@ namespace Windows_Forms_Attempt
                 "Imagenes/bots/moto_bot_derecha.png",
                 "Imagenes/bots/moto_bot_arriba.png",
                 "Imagenes/bots/moto_bot_izquierda.png",
-                "Imagenes/bots/moto_bot_abajo.png"
+                "Imagenes/bots/moto_bot_abajo.png",
+                "Imagenes/bots/escombros.png"
             };
 
             player = new SingleLinkedForGame();
-            this.motorcycle = new Motorcycle(executionsPerSecond, 0, 20, images_player, this.pictureBox1, 1);
+            this.motorcycle = new Motorcycle(executionsPerSecond, 0, 1000, images_player, this.pictureBox1, 1);
             player.Add(this.motorcycle);
             All_Objects_For_Colisions.Add(this.motorcycle);
 
@@ -437,13 +460,12 @@ namespace Windows_Forms_Attempt
             for (int k = 0; k < 4; k++) //Creation of bots
             {
                 PictureBox box_grid = box_list_bots[k];
-                MotorcycleBot bot = new MotorcycleBot(0, 0, images_bots, box_grid, 5 * k, 7 * k, 1);
+                MotorcycleBot bot = new MotorcycleBot(0, 0, images_bots, box_grid, 5 * k, 7 * k, 1, k);
                 list_bots.Add(bot);
                 All_Objects_For_Colisions.Add(bot);
                 Organize_Bots_In_List(bot, k, estelas_boxes);
             }
         }
-
         private void Organize_Bots_In_List(MotorcycleBot bot , int indicator, List<PictureBox> estelas_boxes )
         {
             if (indicator == 0)
@@ -467,7 +489,6 @@ namespace Windows_Forms_Attempt
                 Create_Stels_For_bots(bot4, 4, estelas_boxes);
             }
         }
-
         private void Create_Stels_For_bots(SingleLinkedForGame list, int num_bot, List<PictureBox> estelas_boxes)
         {
             if (num_bot == 1)
