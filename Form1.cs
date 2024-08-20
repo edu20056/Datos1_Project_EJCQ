@@ -15,10 +15,7 @@ namespace Windows_Forms_Attempt
         private List<MotorcycleBot> list_bots;
         private List<ArrayGrid.Node> nodes;
         private System.Windows.Forms.Timer timer_player;
-        private System.Windows.Forms.Timer timer_bot1;
-        private System.Windows.Forms.Timer timer_bot2;
-        private System.Windows.Forms.Timer timer_bot3;
-        private System.Windows.Forms.Timer timer_bot4;
+        private System.Windows.Forms.Timer[] botTimers;
         private int executionsPerSecond;
         private TextBox speedTextBox;
         private Button updateSpeedButton;
@@ -46,29 +43,22 @@ namespace Windows_Forms_Attempt
             executionsPerSecond = 3; // Default executions per second, it represents the speed.
 
             timer_player = new System.Windows.Forms.Timer();
-            UpdateTimerInterval(); //timer.Interval = 333; 
+            UpdateTimerInterval(); // Actualiza el intervalo del temporizador del jugador
             timer_player.Tick += new EventHandler(Fuel_Check);
             timer_player.Start();
 
-            timer_bot1 = new System.Windows.Forms.Timer();
-            timer_bot1.Interval = 400;
-            timer_bot1.Tick += (sender, e) => Set_bots_movement(sender, e, 0); 
-            timer_bot1.Start();
-            
-            timer_bot2 = new System.Windows.Forms.Timer();
-            timer_bot2.Interval = 400;
-            timer_bot2.Tick += (sender, e) => Set_bots_movement(sender, e, 1); 
-            timer_bot2.Start();
+            // Crear e inicializar los temporizadores de los bots
+            int botCount = 4;
+            botTimers = new System.Windows.Forms.Timer[botCount];
 
-            timer_bot3 = new System.Windows.Forms.Timer();
-            timer_bot3.Interval = 400;
-            timer_bot3.Tick += (sender, e) => Set_bots_movement(sender, e, 2); 
-            timer_bot3.Start();
-            
-            timer_bot4 = new System.Windows.Forms.Timer();
-            timer_bot4.Interval = 400;
-            timer_bot4.Tick += (sender, e) => Set_bots_movement(sender, e, 3); 
-            timer_bot4.Start();
+            for (int i = 0; i < botCount; i++)
+            {
+                botTimers[i] = new System.Windows.Forms.Timer();
+                botTimers[i].Interval = 400;
+                int botIndex = i; // Capturar la variable en el contexto local
+                botTimers[i].Tick += (sender, e) => Set_bots_movement(sender, e, botIndex);
+                botTimers[i].Start();
+            }
             
             this.KeyPreview = true;
             this.KeyDown += new KeyEventHandler(Movement);
@@ -190,6 +180,10 @@ namespace Windows_Forms_Attempt
             else
             {
                 timer_player.Stop();
+                foreach (System.Windows.Forms.Timer timer in botTimers)
+                {
+                    timer.Stop();
+                }
                 MessageBox.Show("Game Over");
             }
         }
@@ -214,9 +208,6 @@ namespace Windows_Forms_Attempt
                 firstEstela.Set_Dirr(this.motorcycle.Get_Move_Indicator());
             }
         }
-
-
-
         private void Movement(object sender, KeyEventArgs e) //if any key is pressed, changes players direction
         {
             // Change direction based on the arrow key pressed
@@ -298,11 +289,13 @@ namespace Windows_Forms_Attempt
             };
 
             player = new DoubleLinkedForGame();
-            this.motorcycle = new Motorcycle(executionsPerSecond, 3, 100, images_player, this.pictureBox1, 1);
+            this.motorcycle = new Motorcycle(executionsPerSecond, 0, 20, images_player, this.pictureBox1, 1);
             Estela es1_player = new Estela(estelas_boxes[0],2,0,1);
+            this.motorcycle.Add_Stels();
             Estela es2_player = new Estela(estelas_boxes[1],1,0,1);
+            this.motorcycle.Add_Stels();
             Estela es3_player = new Estela(estelas_boxes[2],0,0,1);
-            Estela es4_player = new Estela(estelas_boxes[3],0,0,1);
+            this.motorcycle.Add_Stels();
 
 
             //Adding instances of player
@@ -310,7 +303,6 @@ namespace Windows_Forms_Attempt
             player.Add(es1_player);
             player.Add(es2_player);
             player.Add(es3_player);
-            player.Add(es4_player);
 
 
             for (int k = 0; k < 4; k++)
@@ -318,6 +310,10 @@ namespace Windows_Forms_Attempt
                 PictureBox box_grid = box_list_bots[k];
                 MotorcycleBot bot = new MotorcycleBot(3, 3, images_bots, box_grid, 5 * k, 7 * k, 1);
                 list_bots.Add(bot);
+                //Para realizar estelas de bots hace falta lógica para añadirlas, despsués para el movimiento se puede crear una funcion
+                //que sea similiar a UpdateEstelas_Player() solo que al inicio habrá un for para cada elemento de la lista de bots
+                //Creo que la lista de bots podría cambiarse por una lista de listas tipo DoubleLinkedListForPlayersAndBots.
+                //Esto ahorraría lógico, creoooooo.
             }
         }
 

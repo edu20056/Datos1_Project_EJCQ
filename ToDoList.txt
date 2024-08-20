@@ -6,6 +6,10 @@ Sobre los bots:
     -Hace falta las imágenes de estelas (Agregar moto como lista enlazada simple).
 
 COLISIONES entre bots y main Character.
+Para colisiones tengo 2 ideas: 
+    -Revisar constantemente el grid, y se busca cada objeto estela, bot y moto para ver si hay 2 o más elementos en un nodo, si de esos elementos 
+    alguno es moto o bot destruya ese bot.
+    -Que cada bot y jugador revise constantemente si choca con algo. (esta idea me gusta más)
 
 Tipos de powerups:
     -Spawm de powerups (pila).

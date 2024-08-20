@@ -42,6 +42,10 @@ namespace Windows_Forms_Attempt
         {
             return this.fuel;
         }
+        public void Add_Stels()
+        {
+            this.stels++;
+        }
 
         public void Set_fuel(int new_fuel)
         {
