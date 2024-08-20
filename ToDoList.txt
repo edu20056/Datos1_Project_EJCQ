@@ -1,19 +1,14 @@
 Sobre el main Character:
     -Hace falta la implementación de lista de powerups e ítemes.
-    -Hace falta las imágenes de estelas (Agregar moto como lista enlazada simple).
 
 Sobre los bots:
-    -powerups e ítemes
-    -Hace falta las imágenes de estelas (Agregar moto como lista enlazada simple).
-
-COLISIONES entre bots y main Character.
+    -Hace falta la implementación de lista de powerups e ítemes.
 
 Tipos de powerups:
     -Spawm de powerups (pila).
     -Lógica de ordenamiento.   
         -escudo. 
         -Speed bust
-        -estelas add
 
 Tipo de ítmes:
     -Spawm de items (cola)

@@ -1,3 +1,5 @@
+using System.Windows.Forms.VisualStyles;
+
 namespace Windows_Forms_Attempt
 {
     public class MotorcycleBot
@@ -11,7 +13,9 @@ namespace Windows_Forms_Attempt
         private int y;
         private int move_indicator;
 
-        public MotorcycleBot(int speed, int stels, string[] list_images, PictureBox box, int x, int y, int move_indicator)
+        private int position_list_indicator; //Indicates the number of position on SingledLinkedListForPlayers.
+
+        public MotorcycleBot(int speed, int stels, string[] list_images, PictureBox box, int x, int y, int move_indicator, int position_list_indicator)
         {
             this.speed = speed;
             this.stels = stels;
@@ -20,15 +24,32 @@ namespace Windows_Forms_Attempt
             this.x = y;
             this.y = x;
             this.move_indicator = move_indicator;
+            this.position_list_indicator = position_list_indicator;
             Create_Box();
         }
+        public void Add_Stels()
+        {
+            this.stels++;
+        }
 
+        public int Get_position_list_indicator()
+        {
+            return this.position_list_indicator;
+        }
          public void SetSpeed(int newSpeed)
         {
             if (newSpeed > 0)
             {
                 this.speed = newSpeed;
             }
+        }
+        public PictureBox Get_Box()
+        {
+            return this.box;
+        }
+        public int Get_Move_Indicator()
+        {
+            return this.move_indicator;
         }
         public void Create_Box()
         {
@@ -50,6 +71,15 @@ namespace Windows_Forms_Attempt
             this.box.Image = System.Drawing.Image.FromFile(new_image);
         }
 
+        public int Get_x_bot()
+        {
+            return this.x;
+        }
+
+        public int Get_y_bot()
+        {
+            return this.y;
+        }
         public int Current_Image_Direction()
         {
             return this.move_indicator;
