@@ -1,6 +1,6 @@
 namespace Windows_Forms_Attempt
 {
-    public class DoubleLinkedForGame
+    public class SingleLinkedForGame
     {
         private class Node
         {
@@ -20,7 +20,7 @@ namespace Windows_Forms_Attempt
         private Node tail;
         private int size;
 
-        public DoubleLinkedForGame()
+        public SingleLinkedForGame()
         {
             this.head = null;
             this.tail = null;

@@ -9,7 +9,7 @@ namespace Windows_Forms_Attempt
     {
         private PictureBox pictureBox1; //Box for player
         private Motorcycle motorcycle; //Players object
-        private DoubleLinkedForGame player;
+        private SingleLinkedForGame player;
         private MotorcycleBot bot; //generic objecto for creating list of the bots
         private ArrayGrid grid; //Object grid for representing the map and leading to the movement of bots and player
         private List<MotorcycleBot> list_bots;
@@ -23,7 +23,9 @@ namespace Windows_Forms_Attempt
         private TextBox current_fuel;
         private int rest_fuel;
         private Random random = new Random();
-        private List<int> lista_actual_move_bots = new List<int>();
+        private List<int> lista_actual_move_bots = new List<int>(); //this is a list of integers that relate how many times has a bot moved, 
+        //if it reaches a certain number, which is the index number in bots_random_distance, it will change direction and reset the integer index
+        //related to that bot. Logic in Set_bots_movement().
         private List<int> bots_random_distance = new List<int>();
         public Form1()
         {
@@ -53,8 +55,10 @@ namespace Windows_Forms_Attempt
 
             for (int i = 0; i < botCount; i++)
             {
+                int bot_speed = random.Next(299, 401);
                 botTimers[i] = new System.Windows.Forms.Timer();
-                botTimers[i].Interval = 400;
+                botTimers[i].Interval = bot_speed;
+                list_bots[i].SetSpeed(bot_speed);
                 int botIndex = i; // Capturar la variable en el contexto local
                 botTimers[i].Tick += (sender, e) => Set_bots_movement(sender, e, botIndex);
                 botTimers[i].Start();
@@ -187,7 +191,7 @@ namespace Windows_Forms_Attempt
                 MessageBox.Show("Game Over");
             }
         }
-        private void UpdateEstelas_Player()
+        private void UpdateEstelas_Player() //Moves stelas for player
         {
             // Move the last estela first
             for (int i = player.Get_Size() - 1; i > 0; i--)
@@ -288,7 +292,7 @@ namespace Windows_Forms_Attempt
                 "Imagenes/bots/moto_bot_abajo.png"
             };
 
-            player = new DoubleLinkedForGame();
+            player = new SingleLinkedForGame();
             this.motorcycle = new Motorcycle(executionsPerSecond, 0, 20, images_player, this.pictureBox1, 1);
             Estela es1_player = new Estela(estelas_boxes[0],2,0,1);
             this.motorcycle.Add_Stels();
@@ -308,7 +312,7 @@ namespace Windows_Forms_Attempt
             for (int k = 0; k < 4; k++)
             {
                 PictureBox box_grid = box_list_bots[k];
-                MotorcycleBot bot = new MotorcycleBot(3, 3, images_bots, box_grid, 5 * k, 7 * k, 1);
+                MotorcycleBot bot = new MotorcycleBot(0, 3, images_bots, box_grid, 5 * k, 7 * k, 1);
                 list_bots.Add(bot);
                 //Para realizar estelas de bots hace falta lógica para añadirlas, despsués para el movimiento se puede crear una funcion
                 //que sea similiar a UpdateEstelas_Player() solo que al inicio habrá un for para cada elemento de la lista de bots
