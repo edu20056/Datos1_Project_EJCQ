@@ -24,13 +24,21 @@ namespace Windows_Forms_Attempt
             this.move_indicator = move_indicator;
             Create_Box();
         }
-
+        public void Add_Stels()
+        {
+            this.stels++;
+        }
          public void SetSpeed(int newSpeed)
         {
             if (newSpeed > 0)
             {
                 this.speed = newSpeed;
             }
+        }
+
+        public int Get_Move_Indicator()
+        {
+            return this.move_indicator;
         }
         public void Create_Box()
         {

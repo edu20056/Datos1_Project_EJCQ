@@ -12,8 +12,13 @@ namespace Windows_Forms_Attempt
         private SingleLinkedForGame player;
         private MotorcycleBot bot; //generic objecto for creating list of the bots
         private ArrayGrid grid; //Object grid for representing the map and leading to the movement of bots and player
-        private List<MotorcycleBot> list_bots;
+        private List<MotorcycleBot> list_bots; //lists of bot instances
+        private SingleLinkedForGame bot1 = new SingleLinkedForGame();
+        private SingleLinkedForGame bot2 = new SingleLinkedForGame();
+        private SingleLinkedForGame bot3 = new SingleLinkedForGame();
+        private SingleLinkedForGame bot4 = new SingleLinkedForGame();
         private List<ArrayGrid.Node> nodes;
+        private Estela estela;
         private System.Windows.Forms.Timer timer_player;
         private System.Windows.Forms.Timer[] botTimers;
         private int executionsPerSecond;
@@ -65,7 +70,7 @@ namespace Windows_Forms_Attempt
             }
             
             this.KeyPreview = true;
-            this.KeyDown += new KeyEventHandler(Movement);
+            this.KeyDown += new KeyEventHandler(Movement_Key_detector);
 
             InitializeControls();
         }
@@ -96,6 +101,26 @@ namespace Windows_Forms_Attempt
             }
             
             bot.Change_Position(nodes);
+            if (k == 0)
+            {
+                UpdateEstelas_Bots(bot1, bot);
+            }
+
+            else if (k == 1)
+            {
+                UpdateEstelas_Bots(bot2, bot);
+            }
+
+            else if (k == 2)
+            {
+                UpdateEstelas_Bots(bot3, bot);
+            }
+            else
+            {
+                UpdateEstelas_Bots(bot4, bot);
+            }
+
+            
         }
         private void InitializeControls() // Initialize all textboxes and buttons
         {
@@ -151,6 +176,29 @@ namespace Windows_Forms_Attempt
                 MessageBox.Show("Please enter a valid positive integer.");
             }
         }
+
+        private void UpdateEstelas_Bots(SingleLinkedForGame list, MotorcycleBot bot) //Moves stelas for each bot
+        {
+            // Move the last estela first
+            for (int i = list.Get_Size() - 1; i > 0; i--)
+            {
+                if (list.Get(i) is Estela x && list.Get(i - 1) is Estela z)
+                {
+                    x.Set_Dirr(z.Get_Dirr()); // Set direction based on the previous estela
+
+                    // Move this estela to the position of the previous estela
+                    x.Change_Position(nodes, z.Get_X_est(), z.Get_Y_est());
+                }
+            }
+
+            // Move the first estela (index 1) to follow the motorcycle
+            if (list.Get(1) is Estela firstEstela)
+            {
+                firstEstela.Change_Position(nodes, bot.Get_x_bot(), bot.Get_y_bot());
+                firstEstela.Set_Dirr(bot.Get_Move_Indicator());
+            }
+        }
+
 
         private void UpdateTimerInterval() //This function changes directly the execution per second in terms of movement. 
         {
@@ -212,7 +260,7 @@ namespace Windows_Forms_Attempt
                 firstEstela.Set_Dirr(this.motorcycle.Get_Move_Indicator());
             }
         }
-        private void Movement(object sender, KeyEventArgs e) //if any key is pressed, changes players direction
+        private void Movement_Key_detector(object sender, KeyEventArgs e) //if any key is pressed, changes players direction
         {
             // Change direction based on the arrow key pressed
             switch (e.KeyCode)
@@ -266,7 +314,7 @@ namespace Windows_Forms_Attempt
             }
 
             // Implementation of boxes for stels
-            for (int j = 0; j < 12; j++) 
+            for (int j = 0; j < 30; j++) 
             {
                 PictureBox pictureBox = new PictureBox();
                 estelas_boxes.Add(pictureBox);
@@ -294,34 +342,90 @@ namespace Windows_Forms_Attempt
 
             player = new SingleLinkedForGame();
             this.motorcycle = new Motorcycle(executionsPerSecond, 0, 20, images_player, this.pictureBox1, 1);
-            Estela es1_player = new Estela(estelas_boxes[0],2,0,1);
-            this.motorcycle.Add_Stels();
-            Estela es2_player = new Estela(estelas_boxes[1],1,0,1);
-            this.motorcycle.Add_Stels();
-            Estela es3_player = new Estela(estelas_boxes[2],0,0,1);
-            this.motorcycle.Add_Stels();
-
-
-            //Adding instances of player
             player.Add(this.motorcycle);
-            player.Add(es1_player);
-            player.Add(es2_player);
-            player.Add(es3_player);
 
+            for (int i = 0; i < 3; i++) //Creation of players stels.
+            {
+                estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 0, 1);
+                this.motorcycle.Add_Stels();
+                player.Add(estela);
+            }
 
             for (int k = 0; k < 4; k++)
             {
                 PictureBox box_grid = box_list_bots[k];
-                MotorcycleBot bot = new MotorcycleBot(0, 3, images_bots, box_grid, 5 * k, 7 * k, 1);
+                MotorcycleBot bot = new MotorcycleBot(0, 0, images_bots, box_grid, 5 * k, 7 * k, 1);
                 list_bots.Add(bot);
-                //Para realizar estelas de bots hace falta lógica para añadirlas, despsués para el movimiento se puede crear una funcion
-                //que sea similiar a UpdateEstelas_Player() solo que al inicio habrá un for para cada elemento de la lista de bots
-                //Creo que la lista de bots podría cambiarse por una lista de listas tipo DoubleLinkedListForPlayersAndBots.
-                //Esto ahorraría lógico, creoooooo.
+                Organize_Bots_In_List(bot, k, estelas_boxes);
             }
         }
 
-        private void CreateGridDisplay()
+        private void Organize_Bots_In_List(MotorcycleBot bot , int indicator, List<PictureBox> estelas_boxes )
+        {
+            if (indicator == 0)
+            {
+                bot1.Add(bot);
+                Create_Stels_For_bots(bot1, 1, estelas_boxes);
+            }
+            else if (indicator == 1)
+            {
+                bot2.Add(bot);
+                Create_Stels_For_bots(bot2, 2, estelas_boxes);
+            }
+            else if (indicator == 2)
+            {
+                bot3.Add(bot);
+                Create_Stels_For_bots(bot3, 3, estelas_boxes);
+            }
+            else
+            {
+                bot4.Add(bot);
+                Create_Stels_For_bots(bot4, 4, estelas_boxes);
+            }
+        }
+
+        private void Create_Stels_For_bots(SingleLinkedForGame list, int num_bot, List<PictureBox> estelas_boxes)
+        {
+            if (num_bot == 1)
+            {
+                for (int i = 4; i < 7; i++)
+                {
+                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 3, 1);
+                    list_bots[0].Add_Stels();
+                    bot1.Add(estela);
+                }
+            }
+
+            else if (num_bot == 2)
+            {
+                for (int i = 8; i < 11; i++)
+                {
+                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 5, 1);
+                    list_bots[1].Add_Stels();
+                    bot2.Add(estela);
+                }
+            }
+
+            else if (num_bot == 3)
+            {
+                for (int i = 12; i < 15; i++)
+                {
+                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 7, 1);
+                    list_bots[2].Add_Stels();
+                    bot3.Add(estela);
+                }
+            }
+            else
+            {
+                for (int i = 16; i < 19; i++)
+                {
+                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 9, 1);
+                    list_bots[3].Add_Stels();
+                    bot4.Add(estela);
+                }
+            }
+        }
+        private void CreateGridDisplay() //Creates Grid using Nodes
         {
             grid = new ArrayGrid(24, 16);
             nodes = grid.GetNodes();
