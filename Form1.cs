@@ -11,12 +11,15 @@ namespace Windows_Forms_Attempt
         private Motorcycle motorcycle; //Players object
         private SingleLinkedForGame player;
         private MotorcycleBot bot; //generic objecto for creating list of the bots
+        private MotorcycleBot bot_colision; //generic objecto for analizing colision between bots
         private ArrayGrid grid; //Object grid for representing the map and leading to the movement of bots and player
         private List<MotorcycleBot> list_bots; //lists of bot instances
         private SingleLinkedForGame bot1 = new SingleLinkedForGame();
         private SingleLinkedForGame bot2 = new SingleLinkedForGame();
         private SingleLinkedForGame bot3 = new SingleLinkedForGame();
         private SingleLinkedForGame bot4 = new SingleLinkedForGame();
+
+        private List<Object> All_Objects_For_Colisions = new List<object>();
         private List<ArrayGrid.Node> nodes;
         private Estela estela;
         private System.Windows.Forms.Timer timer_player;
@@ -32,7 +35,7 @@ namespace Windows_Forms_Attempt
         //if it reaches a certain number, which is the index number in bots_random_distance, it will change direction and reset the integer index
         //related to that bot. Logic in Set_bots_movement().
         private List<int> bots_random_distance = new List<int>();
-        public Form1()
+        public Form1() // Start
         {
             InitializeComponent_1();
             CreateGridDisplay();
@@ -60,7 +63,7 @@ namespace Windows_Forms_Attempt
 
             for (int i = 0; i < botCount; i++)
             {
-                int bot_speed = random.Next(299, 401);
+                int bot_speed = 10000;//random.Next(299, 401);
                 botTimers[i] = new System.Windows.Forms.Timer();
                 botTimers[i].Interval = bot_speed;
                 list_bots[i].SetSpeed(bot_speed);
@@ -90,6 +93,7 @@ namespace Windows_Forms_Attempt
                 } while (direction == (actual_dir + 2) % 4); // Avoid moving directly backwards
 
                 bot.Move_Image(direction);
+                Analice_Colisions(bot);
             }
             else if (lista_actual_move_bots[k] == bots_random_distance[k] )
             {
@@ -176,7 +180,86 @@ namespace Windows_Forms_Attempt
                 MessageBox.Show("Please enter a valid positive integer.");
             }
         }
+        private void Analice_Colisions(object ob)
+        {
+            try 
+            {
+                Motorcycle moto = (Motorcycle)ob;
+                foreach (object objecto in All_Objects_For_Colisions)
+                {
+                    if (moto == objecto)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            MotorcycleBot bot = (MotorcycleBot)objecto;
+                            if (bot.Get_x_bot() == moto.Get_x_player() && bot.Get_y_bot() == moto.Get_y_player())
+                            {
+                                timer_player.Stop();
+                                foreach (System.Windows.Forms.Timer timer in botTimers)
+                                {
+                                    timer.Stop();
+                                }
+                                MessageBox.Show("Game Over");
+                            }
+                        }
+                        catch
+                        {
+                            Estela estela = (Estela)objecto;
+                            if (estela.Get_X_est() == moto.Get_x_player() && estela.Get_Y_est() == moto.Get_y_player())
+                            {
+                                timer_player.Stop();
+                                foreach (System.Windows.Forms.Timer timer in botTimers)
+                                {
+                                    timer.Stop();
+                                }
+                                MessageBox.Show("Game Over");
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                MotorcycleBot bot = (MotorcycleBot)ob;
+                foreach (object objecto in All_Objects_For_Colisions)
+                {
+                    if (objecto is Motorcycle )
+                    {
+                        continue;
+                    }
 
+                    else if (objecto == bot)
+                    {
+                        continue;
+                    }
+                    try 
+                    {
+                        Estela estela = (Estela)objecto;
+                        if (estela.Get_X_est() == bot.Get_x_bot() && estela.Get_Y_est() == bot.Get_y_bot())
+                        {
+                            this.Controls.Remove(bot.Get_Box());
+                            bot.Get_Box().Dispose();
+                        }
+                    }
+                    catch
+                    {
+                        MotorcycleBot bot_colision = (MotorcycleBot)objecto;
+                        if (bot_colision.Get_x_bot() == bot.Get_x_bot() && bot_colision.Get_y_bot() == bot.Get_y_bot())
+                        {
+                            this.Controls.Remove(bot.Get_Box());
+                            bot.Get_Box().Dispose();
+
+                            this.Controls.Remove(bot_colision.Get_Box());
+                            bot_colision.Get_Box().Dispose();
+                        } 
+                    }
+                }
+            }
+        }
         private void UpdateEstelas_Bots(SingleLinkedForGame list, MotorcycleBot bot) //Moves stelas for each bot
         {
             // Move the last estela first
@@ -194,11 +277,10 @@ namespace Windows_Forms_Attempt
             // Move the first estela (index 1) to follow the motorcycle
             if (list.Get(1) is Estela firstEstela)
             {
-                firstEstela.Change_Position(nodes, bot.Get_x_bot(), bot.Get_y_bot());
                 firstEstela.Set_Dirr(bot.Get_Move_Indicator());
+                firstEstela.Change_Position(nodes, bot.Get_x_bot(), bot.Get_y_bot());
             }
         }
-
 
         private void UpdateTimerInterval() //This function changes directly the execution per second in terms of movement. 
         {
@@ -211,6 +293,7 @@ namespace Windows_Forms_Attempt
         {
             // Move the motorcycle automatically
             this.motorcycle.Change_Position(nodes);
+            Analice_Colisions(this.motorcycle);
             int fuel = this.motorcycle.Get_fuel();
             if (fuel > 0)
             {
@@ -322,8 +405,6 @@ namespace Windows_Forms_Attempt
                 pictureBox.BackColor = Color.Transparent; 
                 this.Controls.Add(pictureBox); 
             }
-
-
             // Crear la instancia de Motorcycle
             string[] images_player = new string[]
             {
@@ -343,19 +424,22 @@ namespace Windows_Forms_Attempt
             player = new SingleLinkedForGame();
             this.motorcycle = new Motorcycle(executionsPerSecond, 0, 20, images_player, this.pictureBox1, 1);
             player.Add(this.motorcycle);
+            All_Objects_For_Colisions.Add(this.motorcycle);
 
             for (int i = 0; i < 3; i++) //Creation of players stels.
             {
-                estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 0, 1);
+                estela = new Estela(estelas_boxes[i], Math.Abs(i - 8), 0);
                 this.motorcycle.Add_Stels();
                 player.Add(estela);
+                All_Objects_For_Colisions.Add(estela);
             }
 
-            for (int k = 0; k < 4; k++)
+            for (int k = 0; k < 4; k++) //Creation of bots
             {
                 PictureBox box_grid = box_list_bots[k];
                 MotorcycleBot bot = new MotorcycleBot(0, 0, images_bots, box_grid, 5 * k, 7 * k, 1);
                 list_bots.Add(bot);
+                All_Objects_For_Colisions.Add(bot);
                 Organize_Bots_In_List(bot, k, estelas_boxes);
             }
         }
@@ -390,9 +474,10 @@ namespace Windows_Forms_Attempt
             {
                 for (int i = 4; i < 7; i++)
                 {
-                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 3, 1);
+                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 3);
                     list_bots[0].Add_Stels();
                     bot1.Add(estela);
+                    All_Objects_For_Colisions.Add(estela);
                 }
             }
 
@@ -400,9 +485,10 @@ namespace Windows_Forms_Attempt
             {
                 for (int i = 8; i < 11; i++)
                 {
-                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 5, 1);
+                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 5);
                     list_bots[1].Add_Stels();
                     bot2.Add(estela);
+                    All_Objects_For_Colisions.Add(estela);
                 }
             }
 
@@ -410,18 +496,20 @@ namespace Windows_Forms_Attempt
             {
                 for (int i = 12; i < 15; i++)
                 {
-                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 7, 1);
+                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 7);
                     list_bots[2].Add_Stels();
                     bot3.Add(estela);
+                    All_Objects_For_Colisions.Add(estela);
                 }
             }
             else
             {
                 for (int i = 16; i < 19; i++)
                 {
-                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 9, 1);
+                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 9);
                     list_bots[3].Add_Stels();
                     bot4.Add(estela);
+                    All_Objects_For_Colisions.Add(estela);
                 }
             }
         }

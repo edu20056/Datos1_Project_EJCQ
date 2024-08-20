@@ -35,7 +35,10 @@ namespace Windows_Forms_Attempt
                 this.speed = newSpeed;
             }
         }
-
+        public PictureBox Get_Box()
+        {
+            return this.box;
+        }
         public int Get_Move_Indicator()
         {
             return this.move_indicator;

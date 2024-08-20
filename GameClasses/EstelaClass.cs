@@ -7,12 +7,11 @@ namespace Windows_Forms_Attempt
         private int y;
         int prev_val;
 
-        public Estela(PictureBox box, int x, int y, int prev_val)
+        public Estela(PictureBox box, int x, int y)
         {
             this.box = box;
             this.x = x;
             this.y = y;
-            this.prev_val = prev_val;
             Create_Box();
         }
 

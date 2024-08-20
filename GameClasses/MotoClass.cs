@@ -25,7 +25,7 @@ namespace Windows_Forms_Attempt
             this.list_images = list_images;
             this.box = box;
             this.move_indicator = move_indicator;
-            this.x = 2;
+            this.x = 8;
             this.y = 0;
             Create_Box(); // Configure the PictureBox inside the Motorcycle class
         }
