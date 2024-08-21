@@ -4,6 +4,8 @@ Sobre el main Character:
 Sobre los bots:
     -Hace falta la implementación de lista de powerups e ítemes.
 
+Falta crear los boxes de los power ups y items list y añadirlos cada 15 segundos.
+
 Tipos de powerups:
     -Spawm de powerups (pila).
     -Lógica de ordenamiento.   

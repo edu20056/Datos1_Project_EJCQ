@@ -4,11 +4,12 @@ namespace Windows_Forms_Attempt
 
 public class PriorityQueue
 {
+    //used for items
     private class Node
     {
-        public int Element { get; set; }
-        public int Priority { get; set; }
-        public Node Next { get; set; }
+        public int Element;
+        public int Priority;
+        public Node Next;
 
         public Node(int element, int priority)
         {

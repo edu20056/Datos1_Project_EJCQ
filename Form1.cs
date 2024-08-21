@@ -11,18 +11,22 @@ namespace Windows_Forms_Attempt
         private Motorcycle motorcycle; //Players object
         private SingleLinkedForGame player;
         private MotorcycleBot bot; //generic objecto for creating list of the bots
-        private MotorcycleBot bot_colision; //generic objecto for analizing colision between bots
         private ArrayGrid grid; //Object grid for representing the map and leading to the movement of bots and player
         private List<MotorcycleBot> list_bots; //lists of bot instances
-        private SingleLinkedForGame bot1 = new SingleLinkedForGame();
-        private SingleLinkedForGame bot2 = new SingleLinkedForGame();
-        private SingleLinkedForGame bot3 = new SingleLinkedForGame();
-        private SingleLinkedForGame bot4 = new SingleLinkedForGame();
-
-        private List<Object> All_Objects_For_Colisions = new List<object>();
-        private List<ArrayGrid.Node> nodes;
+        private SingleLinkedForGame bot1 = new SingleLinkedForGame();//bot1 LinkedList
+        private SingleLinkedForGame bot2 = new SingleLinkedForGame();//bot2 LinkedList
+        private SingleLinkedForGame bot3 = new SingleLinkedForGame();//bot3 LinkedList
+        private SingleLinkedForGame bot4 = new SingleLinkedForGame();//bot4 LinkedList
+        private List<Object> All_Objects_For_Colisions = new List<object>(); //All objects that can kill player or bots.
+        private List<PriorityQueue> List_Items_All_Characters = new List<PriorityQueue>(); //List with all item Queue list for each bot and the player.
+        private List<ArrayStack> List_Power_Ups_All_Characters = new List<ArrayStack>(); //List with all power ups for each bot and the player.
+        private List<PictureBox> Boxes_for_items_and_powerups = new List<PictureBox>(); //List that contains all Pictures boxes of all items and powerups
+        private List<item_PU> All_items_and_powerups = new List<item_PU>(); //List with all items and powerups presented.
+        private int ref_it_pu = 0; //reference for using PictureBox when spawning item of power up.
+        private List<ArrayGrid.Node> nodes; //Array with nodes for creating map.
         private Estela estela;
         private System.Windows.Forms.Timer timer_player;
+        private System.Windows.Forms.Timer Spaw_items_powerups;
         private System.Windows.Forms.Timer[] botTimers;
         private int executionsPerSecond;
         private TextBox speedTextBox;
@@ -31,23 +35,22 @@ namespace Windows_Forms_Attempt
         private TextBox current_fuel;
         private int rest_fuel;
         private Random random = new Random();
-        private int killed_bot = 0;
         private List<int> lista_actual_move_bots = new List<int>(); //this is a list of integers that relate how many times has a bot moved, 
         //if it reaches a certain number, which is the index number in bots_random_distance, it will change direction and reset the integer index
         //related to that bot. Logic in Set_bots_movement().
         private List<int> bots_random_distance = new List<int>();
+        private List<int> current_bots_nedded_rest_fuel = new List<int>(); //Gives a number that when reaches another certain number will change 
+        //by decreasing the fuel value in each bot.
         public Form1() // Start
         {
             InitializeComponent_1();
+            Create_item_and_powerups_list();
             CreateGridDisplay();
             for (int i = 0; i < 4; i++)
             {
                 lista_actual_move_bots.Add(0);
-            }
-
-            for (int i = 0; i < 4; i++)
-            {
                 bots_random_distance.Add(0);
+                current_bots_nedded_rest_fuel.Add(0);
             }
 
             rest_fuel = 0;
@@ -55,8 +58,14 @@ namespace Windows_Forms_Attempt
 
             timer_player = new System.Windows.Forms.Timer();
             UpdateTimerInterval(); // Actualiza el intervalo del temporizador del jugador
-            timer_player.Tick += new EventHandler(Fuel_Check);
+            timer_player.Tick += new EventHandler(Fuel_Check_And_Player_Movement);
             timer_player.Start();
+
+            Spaw_items_powerups = new System.Windows.Forms.Timer();
+            Spaw_items_powerups.Interval = 15000;
+            Spaw_items_powerups.Tick += new EventHandler(Spaw_Consumables);
+            Spaw_items_powerups.Start();
+
 
             // Crear e inicializar los temporizadores de los bots
             int botCount = 4;
@@ -69,7 +78,7 @@ namespace Windows_Forms_Attempt
                 botTimers[i].Interval = bot_speed;
                 list_bots[i].SetSpeed(bot_speed);
                 int botIndex = i; // Capturar la variable en el contexto local
-                botTimers[i].Tick += (sender, e) => Set_bots_movement(sender, e, botIndex);
+                botTimers[i].Tick += (sender, e) => Set_bots_movement_Fuel_check(sender, e, botIndex);
                 botTimers[i].Start();
             }
             
@@ -78,7 +87,7 @@ namespace Windows_Forms_Attempt
 
             InitializeControls();
         }
-        public void Set_bots_movement(object sender, EventArgs e, int k)
+        public void Set_bots_movement_Fuel_check(object sender, EventArgs e, int k)
          {
             bot = list_bots[k];
             if (lista_actual_move_bots[k] == 0)
@@ -128,7 +137,30 @@ namespace Windows_Forms_Attempt
                 Analice_Colisions(bot, bot4);
                 UpdateEstelas_Bots(bot4, bot);
             }
-
+            
+            int numberfuel = current_bots_nedded_rest_fuel[k];
+            int fuel = bot.Get_Fuel();
+            if (fuel > 0)
+            {
+                if (numberfuel == 3) //The bot moves 3 times before losing 1 fuel.
+                {
+                    fuel--;
+                    bot.Set_Fuel(fuel);
+                    current_bots_nedded_rest_fuel[k] = 0;
+                }
+                else
+                {
+                    numberfuel++;
+                    current_bots_nedded_rest_fuel[k] = numberfuel;
+                }
+            }
+            else
+            {
+                int ind = bot.Get_position_list_indicator();
+                botTimers[ind].Stop();
+                bot.Move_Image(4);
+                All_Objects_For_Colisions.Remove(bot);
+            }
             
         }
         private void InitializeControls() // Initialize all textboxes and buttons
@@ -204,11 +236,12 @@ namespace Windows_Forms_Attempt
                             if (bot.Get_x_bot() == moto.Get_x_player() && bot.Get_y_bot() == moto.Get_y_player())
                             {
                                 timer_player.Stop();
+                                Spaw_items_powerups.Stop();
                                 foreach (System.Windows.Forms.Timer timer in botTimers)
                                 {
                                     timer.Stop();
                                 }
-                                MessageBox.Show("Game Over");
+                                MessageBox.Show("Game Over! You collided with a game Bot.");
                             }
                         }
                         catch
@@ -221,11 +254,12 @@ namespace Windows_Forms_Attempt
                             else if (estela.Get_X_est() == moto.Get_x_player() && estela.Get_Y_est() == moto.Get_y_player())
                             {
                                 timer_player.Stop();
+                                Spaw_items_powerups.Stop();
                                 foreach (System.Windows.Forms.Timer timer in botTimers)
                                 {
                                     timer.Stop();
                                 }
-                                MessageBox.Show("Game Over");
+                                MessageBox.Show("Game Over! You collided with a curious object.");
                             }
                         }
                     }
@@ -234,25 +268,31 @@ namespace Windows_Forms_Attempt
             catch
             {
                 MotorcycleBot bot = (MotorcycleBot)ob;
-                foreach (object objecto in All_Objects_For_Colisions)
+                for (int i = All_Objects_For_Colisions.Count - 1; i >= 0; i--) // foreach cant be used here because the destroyed bots must be
+                //removed form "All_Objects_For_Colisions".
                 {
-                    if (objecto is Motorcycle )
+                    object objecto = All_Objects_For_Colisions[i];
+                    
+                    if (objecto is Motorcycle)
                     {
                         continue;
                     }
 
-                    else if (objecto == bot)
+                    if (objecto == bot)
                     {
                         continue;
                     }
-                    try 
+
+                    try
                     {
                         Estela estela = (Estela)objecto;
                         if (estela.Get_X_est() == bot.Get_x_bot() && estela.Get_Y_est() == bot.Get_y_bot())
                         {
                             botTimers[bot.Get_position_list_indicator()].Stop();
-                            killed_bot++;
                             bot.Move_Image(4);
+                            All_Objects_For_Colisions.Remove(bot);
+
+                            Check_Killed_Bots();
                         }
                     }
                     catch
@@ -260,15 +300,19 @@ namespace Windows_Forms_Attempt
                         MotorcycleBot bot_colision = (MotorcycleBot)objecto;
                         if (bot_colision.Get_x_bot() == bot.Get_x_bot() && bot_colision.Get_y_bot() == bot.Get_y_bot())
                         {
-                            botTimers[bot.Get_position_list_indicator()].Stop();
                             bot.Move_Image(4);
-                            killed_bot++;
+                            botTimers[bot.Get_position_list_indicator()].Stop();
+                            All_Objects_For_Colisions.Remove(bot);
+
                             botTimers[bot_colision.Get_position_list_indicator()].Stop();
                             bot_colision.Move_Image(4);
-                            killed_bot++;
-                        } 
+                            All_Objects_For_Colisions.Remove(bot_colision);
+
+                            Check_Killed_Bots();
+                        }
                     }
                 }
+
             }
         }
         private void UpdateEstelas_Bots(SingleLinkedForGame list, MotorcycleBot bot) //Moves stelas for each bot
@@ -294,7 +338,20 @@ namespace Windows_Forms_Attempt
         }
         private void Check_Killed_Bots()
         {
-            if (killed_bot == 4)
+            bool are_bots_not_alive = false;
+            foreach (Object objecto in All_Objects_For_Colisions)
+            {
+                try 
+                {
+                    MotorcycleBot motorcycleBot = (MotorcycleBot)objecto;
+                    are_bots_not_alive = true;
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+            if (are_bots_not_alive == false)
             {
                 timer_player.Stop();
                 foreach (System.Windows.Forms.Timer timer in botTimers)
@@ -311,7 +368,7 @@ namespace Windows_Forms_Attempt
                 timer_player.Interval = 1000 / executionsPerSecond; // Update interval to match new speed
             }
         }
-        private void Fuel_Check(object sender, EventArgs e)
+        private void Fuel_Check_And_Player_Movement(object sender, EventArgs e)
         {
             // Move the motorcycle automatically
             Check_Killed_Bots();
@@ -338,11 +395,12 @@ namespace Windows_Forms_Attempt
             else
             {
                 timer_player.Stop();
+                Spaw_items_powerups.Stop();
                 foreach (System.Windows.Forms.Timer timer in botTimers)
                 {
                     timer.Stop();
                 }
-                MessageBox.Show("Game Over");
+                MessageBox.Show("Game Over! You got out of fuel.");
             }
         }
         private void UpdateEstelas_Player() //Moves stelas for player
@@ -418,6 +476,16 @@ namespace Windows_Forms_Attempt
                 this.Controls.Add(pictureBox); 
             }
 
+            //Implementation of boxes por Items and Powerups
+            for (int j = 0; j < 50; j++)
+            {
+                PictureBox pictureBox = new PictureBox();
+                Boxes_for_items_and_powerups.Add(pictureBox);
+                pictureBox.Size = new Size(50, 50);
+                pictureBox.BackColor = Color.Transparent; 
+                this.Controls.Add(pictureBox);
+            } 
+
             // Implementation of boxes for stels
             for (int j = 0; j < 30; j++) 
             {
@@ -460,7 +528,7 @@ namespace Windows_Forms_Attempt
             for (int k = 0; k < 4; k++) //Creation of bots
             {
                 PictureBox box_grid = box_list_bots[k];
-                MotorcycleBot bot = new MotorcycleBot(0, 0, images_bots, box_grid, 5 * k, 7 * k, 1, k);
+                MotorcycleBot bot = new MotorcycleBot(0, 0, 75, images_bots, box_grid, 5 * k, 7 * k, 1, k); 
                 list_bots.Add(bot);
                 All_Objects_For_Colisions.Add(bot);
                 Organize_Bots_In_List(bot, k, estelas_boxes);
@@ -489,13 +557,134 @@ namespace Windows_Forms_Attempt
                 Create_Stels_For_bots(bot4, 4, estelas_boxes);
             }
         }
+        private void Spaw_Consumables(object sender, EventArgs e)
+        {
+            Spawn_items(2*ref_it_pu + 1);
+            Spawn_PowerUps(2*ref_it_pu);
+            ref_it_pu++;
+        }
+        public void Spawn_items(int num)
+        {
+            bool isValidSpawnLocation = false;
+            int item = random.Next(1, 4);
+            int x_it = 0;
+            int y_it = 0;
+
+            while (!isValidSpawnLocation)
+            {
+                isValidSpawnLocation = true; // We supose that x and y obtain randomly are valid for spawning
+                x_it = random.Next(0, 24);
+                y_it = random.Next(0, 16);
+
+                foreach (Object objecto in All_Objects_For_Colisions)
+                {
+                    try
+                    {
+                        Motorcycle motorcycle = objecto as Motorcycle;
+                        if (motorcycle != null && motorcycle.Get_x_player() == x_it && motorcycle.Get_y_player() == y_it)
+                        {
+                            isValidSpawnLocation = false;
+                            break;
+                        }
+
+                        MotorcycleBot bot = objecto as MotorcycleBot;
+                        if (bot != null && bot.Get_x_bot() == x_it && bot.Get_y_bot() == y_it)
+                        {
+                            isValidSpawnLocation = false;
+                            break;
+                        }
+
+                        // Verificación para objeto de tipo Estela
+                        Estela estela = objecto as Estela;
+                        if (estela != null && estela.Get_X_est() == x_it && estela.Get_Y_est() == y_it)
+                        {
+                            isValidSpawnLocation = false;
+                            break;
+                        }
+                        else
+                        {
+                            isValidSpawnLocation = true;
+                        }
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+                if (isValidSpawnLocation)
+                {
+                    item_PU items = new item_PU(item, Boxes_for_items_and_powerups[num]);
+                    items.Change_Position(nodes, x_it, y_it);
+                    All_items_and_powerups.Add(items);
+                }
+
+            }
+        }
+        public void Spawn_PowerUps(int num)
+        {
+            
+            bool isValidSpawnLocation = false;
+            int pu = random.Next(4, 6);
+            int x_pu = 0;
+            int y_pu = 0;
+
+            while (!isValidSpawnLocation)
+            {
+                isValidSpawnLocation = true; // We supose that x and y obtain randomly are valid for spawning
+                x_pu = random.Next(0, 24);
+                y_pu = random.Next(0, 16);
+
+                foreach (Object objecto in All_Objects_For_Colisions)
+                {
+                    try
+                    {
+                        Motorcycle motorcycle = objecto as Motorcycle;
+                        if (motorcycle != null && motorcycle.Get_x_player() == x_pu && motorcycle.Get_y_player() == y_pu)
+                        {
+                            isValidSpawnLocation = false;
+                            break;
+                        }
+
+                        MotorcycleBot bot = objecto as MotorcycleBot;
+                        if (bot != null && bot.Get_x_bot() == x_pu && bot.Get_y_bot() == y_pu)
+                        {
+                            isValidSpawnLocation = false;
+                            break;
+                        }
+
+                        // Verificación para objeto de tipo Estela
+                        Estela estela = objecto as Estela;
+                        if (estela != null && estela.Get_X_est() == x_pu && estela.Get_Y_est() == y_pu)
+                        {
+                            isValidSpawnLocation = false;
+                            break;
+                        }
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+                if (isValidSpawnLocation)
+                {
+                    item_PU powerup = new item_PU(pu, Boxes_for_items_and_powerups[num]); 
+                    powerup.Change_Position(nodes, x_pu, y_pu);
+                    All_items_and_powerups.Add(powerup);
+                }
+                else
+                {
+                    isValidSpawnLocation = true;
+                }
+
+            }
+        }
         private void Create_Stels_For_bots(SingleLinkedForGame list, int num_bot, List<PictureBox> estelas_boxes)
         {
             if (num_bot == 1)
             {
                 for (int i = 4; i < 7; i++)
                 {
-                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 3);
+                    estela = new Estela(estelas_boxes[i], 0, 0);
                     list_bots[0].Add_Stels();
                     bot1.Add(estela);
                     All_Objects_For_Colisions.Add(estela);
@@ -506,7 +695,7 @@ namespace Windows_Forms_Attempt
             {
                 for (int i = 8; i < 11; i++)
                 {
-                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 5);
+                    estela = new Estela(estelas_boxes[i], 0, -0);
                     list_bots[1].Add_Stels();
                     bot2.Add(estela);
                     All_Objects_For_Colisions.Add(estela);
@@ -517,7 +706,7 @@ namespace Windows_Forms_Attempt
             {
                 for (int i = 12; i < 15; i++)
                 {
-                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 7);
+                    estela = new Estela(estelas_boxes[i], 0, 0);
                     list_bots[2].Add_Stels();
                     bot3.Add(estela);
                     All_Objects_For_Colisions.Add(estela);
@@ -527,12 +716,28 @@ namespace Windows_Forms_Attempt
             {
                 for (int i = 16; i < 19; i++)
                 {
-                    estela = new Estela(estelas_boxes[i], Math.Abs(i - 2), 9);
+                    estela = new Estela(estelas_boxes[i], 0, 0);
                     list_bots[3].Add_Stels();
                     bot4.Add(estela);
                     All_Objects_For_Colisions.Add(estela);
                 }
             }
+        }
+        public void Create_item_and_powerups_list()
+        {   
+            for (int i = 0; i < 5; i++)
+            {
+                PriorityQueue queue = new PriorityQueue();
+                List_Items_All_Characters.Add(queue);
+
+                ArrayStack stack = new ArrayStack(15);
+                List_Power_Ups_All_Characters.Add(stack);
+
+                //For both index 4 represents the lists for player
+                //the other ones are for bots because of their "atribute" "int position_list_indicator" which is from 0 to 3,
+                // it depends on the but number.
+            }
+            
         }
         private void CreateGridDisplay() //Creates Grid using Nodes
         {
