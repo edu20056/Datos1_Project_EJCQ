@@ -217,6 +217,23 @@ namespace Windows_Forms_Attempt
                 MessageBox.Show("Please enter a valid positive integer.");
             }
         }
+        private void Colisions_With_Consumable(Object npc, int indicator)
+        {
+            
+            try
+            {
+                Motorcycle motorcycle = (Motorcycle)npc;
+                int x = motorcycle.Get_x_player();
+                int y = motorcycle.Get_y_player();
+            }
+            catch
+            {
+                MotorcycleBot bot = (MotorcycleBot)npc;
+                int x = bot.Get_x_bot();
+                int y = bot.Get_y_bot();
+
+            }
+        }
         private void Analice_Colisions(object ob, SingleLinkedForGame list)
         {
             try 
@@ -354,6 +371,7 @@ namespace Windows_Forms_Attempt
             if (are_bots_not_alive == false)
             {
                 timer_player.Stop();
+                Spaw_items_powerups.Stop();
                 foreach (System.Windows.Forms.Timer timer in botTimers)
                 {
                     timer.Stop();
@@ -565,17 +583,19 @@ namespace Windows_Forms_Attempt
         }
         public void Spawn_items(int num)
         {
-            bool isValidSpawnLocation = false;
+            bool isValidSpawnLocation;
             int item = random.Next(1, 4);
-            int x_it = 0;
-            int y_it = 0;
+            int x_it;
+            int y_it;
 
-            while (!isValidSpawnLocation)
+            do
             {
-                isValidSpawnLocation = true; // We supose that x and y obtain randomly are valid for spawning
+                isValidSpawnLocation = true; // Suponemos que la posición es válida
+
                 x_it = random.Next(0, 24);
                 y_it = random.Next(0, 16);
 
+                // Verificar colisiones con otros objetos
                 foreach (Object objecto in All_Objects_For_Colisions)
                 {
                     try
@@ -594,16 +614,11 @@ namespace Windows_Forms_Attempt
                             break;
                         }
 
-                        // Verificación para objeto de tipo Estela
                         Estela estela = objecto as Estela;
                         if (estela != null && estela.Get_X_est() == x_it && estela.Get_Y_est() == y_it)
                         {
                             isValidSpawnLocation = false;
                             break;
-                        }
-                        else
-                        {
-                            isValidSpawnLocation = true;
                         }
                     }
                     catch
@@ -611,29 +626,47 @@ namespace Windows_Forms_Attempt
                         continue;
                     }
                 }
-                if (isValidSpawnLocation)
+
+                // Verificar colisiones con ítems y power-ups existentes
+                foreach (Object objectos in All_items_and_powerups)
                 {
-                    item_PU items = new item_PU(item, Boxes_for_items_and_powerups[num]);
-                    items.Change_Position(nodes, x_it, y_it);
-                    All_items_and_powerups.Add(items);
+                    try
+                    {
+                        item_PU obj = objectos as item_PU;
+                        if (obj != null && obj.Get_x() == x_it && obj.Get_y() == y_it)
+                        {
+                            isValidSpawnLocation = false;
+                            break;
+                        }
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                 }
 
-            }
+            } while (!isValidSpawnLocation); // Continuar buscando una posición válida
+
+            // Si se encuentra una posición válida, crear y agregar el ítem
+            item_PU items = new item_PU(item, Boxes_for_items_and_powerups[num]);
+            items.Change_Position(nodes, x_it, y_it);
+            All_items_and_powerups.Add(items);
         }
         public void Spawn_PowerUps(int num)
         {
-            
-            bool isValidSpawnLocation = false;
+            bool isValidSpawnLocation;
             int pu = random.Next(4, 6);
-            int x_pu = 0;
-            int y_pu = 0;
+            int x_pu;
+            int y_pu;
 
-            while (!isValidSpawnLocation)
+            do
             {
-                isValidSpawnLocation = true; // We supose that x and y obtain randomly are valid for spawning
+                isValidSpawnLocation = true; // Suponemos que la posición es válida
+
                 x_pu = random.Next(0, 24);
                 y_pu = random.Next(0, 16);
 
+                // Verificar colisiones con otros objetos
                 foreach (Object objecto in All_Objects_For_Colisions)
                 {
                     try
@@ -652,7 +685,6 @@ namespace Windows_Forms_Attempt
                             break;
                         }
 
-                        // Verificación para objeto de tipo Estela
                         Estela estela = objecto as Estela;
                         if (estela != null && estela.Get_X_est() == x_pu && estela.Get_Y_est() == y_pu)
                         {
@@ -665,18 +697,31 @@ namespace Windows_Forms_Attempt
                         continue;
                     }
                 }
-                if (isValidSpawnLocation)
+
+                // Verificar colisiones con ítems y power-ups existentes
+                foreach (Object objectos in All_items_and_powerups)
                 {
-                    item_PU powerup = new item_PU(pu, Boxes_for_items_and_powerups[num]); 
-                    powerup.Change_Position(nodes, x_pu, y_pu);
-                    All_items_and_powerups.Add(powerup);
-                }
-                else
-                {
-                    isValidSpawnLocation = true;
+                    try
+                    {
+                        item_PU obj = objectos as item_PU;
+                        if (obj != null && obj.Get_x() == x_pu && obj.Get_y() == y_pu)
+                        {
+                            isValidSpawnLocation = false;
+                            break;
+                        }
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                 }
 
-            }
+            } while (!isValidSpawnLocation); // Continuar buscando una posición válida
+
+            // Si se encuentra una posición válida, crear y agregar el power-up
+            item_PU powerup = new item_PU(pu, Boxes_for_items_and_powerups[num]);
+            powerup.Change_Position(nodes, x_pu, y_pu);
+            All_items_and_powerups.Add(powerup);
         }
         private void Create_Stels_For_bots(SingleLinkedForGame list, int num_bot, List<PictureBox> estelas_boxes)
         {

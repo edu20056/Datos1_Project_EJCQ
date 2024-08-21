@@ -1,21 +1,20 @@
 namespace Windows_Forms_Attempt
 {
-    
     public class ArrayStack
     {
-        //Used for powerups
-        private int[] stack;
+        // Used for powerups
+        private item_PU[] stack;
         private int top;
         private int size;
 
         public ArrayStack(int size)
         {
             this.size = size;
-            stack = new int[size];
+            stack = new item_PU[size];
             top = -1;
         }
 
-        public void Push(int element)
+        public void Push(item_PU element)
         {
             if (top == size - 1)
             {
@@ -27,12 +26,12 @@ namespace Windows_Forms_Attempt
             }
         }
 
-        public int Pop()
+        public item_PU Pop()
         {
             if (top == -1)
             {
                 Console.WriteLine("Stack Underflow");
-                return -1;
+                return null;
             }
             else
             {
@@ -40,12 +39,12 @@ namespace Windows_Forms_Attempt
             }
         }
 
-        public int Top()
+        public item_PU Top()
         {
             if (top == -1)
             {
                 Console.WriteLine("Stack Underflow");
-                return -1;
+                return null;
             }
             else
             {
@@ -53,5 +52,4 @@ namespace Windows_Forms_Attempt
             }
         }
     }
-
 }

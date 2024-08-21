@@ -2,87 +2,86 @@ namespace Windows_Forms_Attempt
 {
     using System;
 
-public class PriorityQueue
-{
-    //used for items
-    private class Node
+    public class PriorityQueue
     {
-        public int Element;
-        public int Priority;
-        public Node Next;
+        //used for items
+        private class Node
+        {
+            public item_PU element;
+            public int priority;
+            public Node Next;
 
-        public Node(int element, int priority)
-        {
-            Element = element;
-            Priority = priority;
-            Next = null;
-        }
-    }
-    private Node front;
-    private Node rear;
-
-    public PriorityQueue()
-    {
-        front = null;
-        rear = null;
-    }
-
-    public void Enqueue(int element, int priority)
-    {
-        Node newNode = new Node(element, priority);
-        if (front == null)
-        {
-            front = newNode;
-            rear = newNode;
-        }
-        else if (priority < front.Priority)
-        {
-            newNode.Next = front;
-            front = newNode;
-        }
-        else
-        {
-            Node current = front;
-            while (current.Next != null && current.Next.Priority <= priority)
+            public Node(item_PU element, int priority)
             {
-                current = current.Next;
+                this.element = element;
+                this.priority = priority;
+                Next = null;
             }
-            newNode.Next = current.Next;
-            current.Next = newNode;
-            if (newNode.Next == null)
+        }
+        private Node front;
+        private Node rear;
+
+        public PriorityQueue()
+        {
+            front = null;
+            rear = null;
+        }
+
+        public void Enqueue(item_PU element, int priority)
+        {
+            Node newNode = new Node(element, priority);
+            if (front == null)
             {
+                front = newNode;
                 rear = newNode;
             }
+            else if (priority < front.priority)
+            {
+                newNode.Next = front;
+                front = newNode;
+            }
+            else
+            {
+                Node current = front;
+                while (current.Next != null && current.Next.priority <= priority)
+                {
+                    current = current.Next;
+                }
+                newNode.Next = current.Next;
+                current.Next = newNode;
+                if (newNode.Next == null)
+                {
+                    rear = newNode;
+                }
+            }
+        }
+
+        public item_PU Dequeue()
+        {
+            if (front == null)
+            {
+                Console.WriteLine("Queue Underflow");
+                return null;
+            }
+            else
+            {
+                item_PU element = front.element;
+                front = front.Next;
+                return element;
+            }
+        }
+
+        public item_PU Front()
+        {
+            if (front == null)
+            {
+                Console.WriteLine("Queue Underflow");
+                return null;
+            }
+            else
+            {
+                return front.element;
+            }
         }
     }
-
-    public int Dequeue()
-    {
-        if (front == null)
-        {
-            Console.WriteLine("Queue Underflow");
-            return -1;
-        }
-        else
-        {
-            int element = front.Element;
-            front = front.Next;
-            return element;
-        }
-    }
-
-    public int Front()
-    {
-        if (front == null)
-        {
-            Console.WriteLine("Queue Underflow");
-            return -1;
-        }
-        else
-        {
-            return front.Element;
-        }
-    }
-}
-
 }
