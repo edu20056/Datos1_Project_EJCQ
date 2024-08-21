@@ -55,6 +55,16 @@ namespace Windows_Forms_Attempt
         {
             return this.y;
         }
+
+        public string Get_Image_String()
+        {
+            return this.image;
+        }
+
+        public int Get_value()
+        {
+            return this.value;
+        }
         public void Create_Box()
         {
             if (this.box != null)

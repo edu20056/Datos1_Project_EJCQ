@@ -62,7 +62,7 @@ namespace Windows_Forms_Attempt
             timer_player.Start();
 
             Spaw_items_powerups = new System.Windows.Forms.Timer();
-            Spaw_items_powerups.Interval = 15000;
+            Spaw_items_powerups.Interval = 5000;
             Spaw_items_powerups.Tick += new EventHandler(Spaw_Consumables);
             Spaw_items_powerups.Start();
 
@@ -75,7 +75,7 @@ namespace Windows_Forms_Attempt
             {
                 int bot_speed = random.Next(299, 401);
                 botTimers[i] = new System.Windows.Forms.Timer();
-                botTimers[i].Interval = bot_speed;
+                botTimers[i].Interval = 1000000;//bot_speed;
                 list_bots[i].SetSpeed(bot_speed);
                 int botIndex = i; // Capturar la variable en el contexto local
                 botTimers[i].Tick += (sender, e) => Set_bots_movement_Fuel_check(sender, e, botIndex);
@@ -114,6 +114,7 @@ namespace Windows_Forms_Attempt
             }
             
             bot.Change_Position(nodes);
+            Colisions_With_Consumable(bot, bot.Get_position_list_indicator());
 
             if (k == 0)
             {
@@ -225,12 +226,68 @@ namespace Windows_Forms_Attempt
                 Motorcycle motorcycle = (Motorcycle)npc;
                 int x = motorcycle.Get_x_player();
                 int y = motorcycle.Get_y_player();
+                foreach (item_PU item_PU in All_items_and_powerups)
+                {
+                    int num = item_PU.Get_value();
+                    if (num < 4 && item_PU.Get_x() == x && item_PU.Get_y() == y)
+                    {
+                        if (num == 3) //Colision with bomb
+                        {
+                            timer_player.Stop();
+                            Spaw_items_powerups.Stop();
+                            foreach (System.Windows.Forms.Timer timer in botTimers)
+                            {
+                                timer.Stop();
+                            }
+                            MessageBox.Show("Game Over! You exploted.");
+                        }
+                        else
+                        {
+                            List_Items_All_Characters[indicator].Enqueue(item_PU);
+                            item_PU.Change_Position(nodes,-100,-100);
+                            Show_Items_On_grid();
+                            Show_PowerUps_On_grid();
+                        }
+
+                    }
+                    else if (item_PU.Get_x() == x && item_PU.Get_y() == y)
+                    {
+                        List_Power_Ups_All_Characters[indicator].Push(item_PU);
+                        item_PU.Change_Position(nodes,-100,-100);
+                        Show_Items_On_grid();
+                        Show_PowerUps_On_grid();
+                    }
+                }
             }
             catch
             {
                 MotorcycleBot bot = (MotorcycleBot)npc;
                 int x = bot.Get_x_bot();
                 int y = bot.Get_y_bot();
+                foreach (item_PU item_PU in All_items_and_powerups)
+                {
+                    int num = item_PU.Get_value();
+                    if (num < 4 && item_PU.Get_x() == x && item_PU.Get_y() == y)
+                    {
+                        if (num == 3)
+                        {
+                            int ind = bot.Get_position_list_indicator();
+                            botTimers[ind].Stop();
+                            bot.Move_Image(4);
+                            All_Objects_For_Colisions.Remove(bot);
+                        }
+                        else
+                        {
+                            List_Items_All_Characters[indicator].Enqueue(item_PU);
+                            item_PU.Change_Position(nodes,-100,-100);
+                        }
+                    }
+                    else if (item_PU.Get_x() == x && item_PU.Get_y() == y)
+                    {
+                        List_Power_Ups_All_Characters[indicator].Push(item_PU);
+                        item_PU.Change_Position(nodes,-100,-100);
+                    }
+                }
 
             }
         }
@@ -392,6 +449,7 @@ namespace Windows_Forms_Attempt
             Check_Killed_Bots();
             this.motorcycle.Change_Position(nodes);
             Analice_Colisions(this.motorcycle, player);
+            Colisions_With_Consumable(this.motorcycle, 4);
             int fuel = this.motorcycle.Get_fuel();
             if (fuel > 0)
             {
@@ -421,6 +479,123 @@ namespace Windows_Forms_Attempt
                 MessageBox.Show("Game Over! You got out of fuel.");
             }
         }
+        
+        
+        
+        // CREATION OF ITEMS AND POWERUPS ON GRID//
+        public void Show_Items_On_grid()
+        {
+            PriorityQueue list_items = List_Items_All_Characters[4];
+            int colocator = 0;
+
+            // Limpiar PictureBoxes específicas
+            Clear_PictureBoxes_For_Items();
+
+            string[] items_PU_images = new string[]
+            {
+                "Imagenes/Items/fuel_tank.png",
+                "Imagenes/Items/add_stels.png",
+                "Imagenes/Items/bomba.png",
+                "Imagenes/PowerUps/speed_up.png",
+                "Imagenes/PowerUps/shield.png"
+            };
+
+            int count = list_items.Count();
+            for (int i = 0; i < count; i++)
+            {
+                item_PU item_PU = list_items.GetByIndex(i);
+
+                int num = item_PU.Get_value();
+                string image_str = items_PU_images[num - 1];
+                Create_Image_for_Items_On_grid(image_str, colocator, 1500);
+                colocator = Increase_colocator(colocator);
+            }
+        }
+        private void Clear_PictureBoxes_For_Items()
+        {
+            // Eliminar PictureBoxes que tienen nombres que empiezan con "item_"
+            foreach (Control control in this.Controls)
+            {
+                if (control is PictureBox pictureBox && pictureBox.Name.StartsWith("item_"))
+                {
+                    this.Controls.Remove(control);
+                    pictureBox.Dispose(); // Liberar recursos
+                }
+            }
+        }
+        public void Create_Image_for_Items_On_grid(string image_str, int colocator, int pos)
+        {
+            PictureBox box = new PictureBox
+            {
+                Size = new Size(25, 25),
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                Location = new Point(pos, colocator * 25 + 25),
+                BackColor = Color.Transparent,
+                Image = System.Drawing.Image.FromFile(image_str),
+                Name = $"item_{colocator}" // Asignar un nombre único basado en colocator
+            };
+
+            this.Controls.Add(box);
+        }
+
+        public void Show_PowerUps_On_grid()
+        {
+            ArrayStack list_stack = List_Power_Ups_All_Characters[4];
+            int colocator = 0;
+
+            Clear_PictureBoxes_For_PU();
+
+            string[] items_PU_images = new string[]
+            {
+                "Imagenes/Items/fuel_tank.png",
+                "Imagenes/Items/add_stels.png",
+                "Imagenes/Items/bomba.png",
+                "Imagenes/PowerUps/speed_up.png",
+                "Imagenes/PowerUps/shield.png"
+            };
+
+            int count = list_stack.Count();
+            for (int i = 0; i < count; i++)
+            {
+                item_PU item_PU = list_stack.GetIndex(i);
+                int num = item_PU.Get_value();
+                string image_str = items_PU_images[num - 1];
+                Create_Image_for_PU_On_grid(image_str, colocator, 1400);
+                colocator = Increase_colocator(colocator);
+            }
+        }
+        public void Create_Image_for_PU_On_grid(string s, int n, int x)
+        {
+                PictureBox box = new PictureBox
+            {
+                Size = new Size(25, 25),
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                Location = new Point(x, n * 25 + 25),
+                BackColor = Color.Transparent,
+                Image = System.Drawing.Image.FromFile(s),
+                Name = $"item_{n}" // Asignar un nombre único basado en colocator
+            };
+
+            this.Controls.Add(box);
+        }
+        public void Clear_PictureBoxes_For_PU()
+        {
+            // Eliminar PictureBoxes que tienen nombres que empiezan con "item_"
+            foreach (Control control in this.Controls)
+            {
+                if (control is PictureBox pictureBox && pictureBox.Name.StartsWith("PU_"))
+                {
+                    this.Controls.Remove(control);
+                    pictureBox.Dispose(); // Liberar recursos
+                }
+            }
+        }
+        public int Increase_colocator(int num)
+        {
+            return num + 1;
+        }
+
+        //
         private void UpdateEstelas_Player() //Moves stelas for player
         {
             // Move the last estela first
@@ -468,7 +643,7 @@ namespace Windows_Forms_Attempt
         private void InitializeComponent_1() //Main loop
         {
             // Configuración del formulario
-            this.ClientSize = new System.Drawing.Size(1400, 800);
+            this.ClientSize = new System.Drawing.Size(1700, 800);
             this.Name = "Form1";
             this.Text = "Trone Game";
 

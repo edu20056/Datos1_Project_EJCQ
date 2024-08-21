@@ -1,23 +1,25 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
 namespace Windows_Forms_Attempt
 {
-    using System;
-
     public class PriorityQueue
     {
-        //used for items
         private class Node
         {
             public item_PU element;
             public int priority;
             public Node Next;
 
-            public Node(item_PU element, int priority)
+            public Node(item_PU element)
             {
                 this.element = element;
-                this.priority = priority;
+                this.priority = element.Get_value();
                 Next = null;
             }
         }
+
         private Node front;
         private Node rear;
 
@@ -27,15 +29,15 @@ namespace Windows_Forms_Attempt
             rear = null;
         }
 
-        public void Enqueue(item_PU element, int priority)
+        public void Enqueue(item_PU element) // Add element
         {
-            Node newNode = new Node(element, priority);
+            Node newNode = new Node(element);
             if (front == null)
             {
                 front = newNode;
                 rear = newNode;
             }
-            else if (priority < front.priority)
+            else if (element.Get_value() < front.priority)
             {
                 newNode.Next = front;
                 front = newNode;
@@ -43,7 +45,7 @@ namespace Windows_Forms_Attempt
             else
             {
                 Node current = front;
-                while (current.Next != null && current.Next.priority <= priority)
+                while (current.Next != null && current.Next.priority <= element.Get_value())
                 {
                     current = current.Next;
                 }
@@ -56,7 +58,7 @@ namespace Windows_Forms_Attempt
             }
         }
 
-        public item_PU Dequeue()
+        public item_PU Dequeue() // Remove element
         {
             if (front == null)
             {
@@ -82,6 +84,40 @@ namespace Windows_Forms_Attempt
             {
                 return front.element;
             }
+        }
+
+        // Get item by index
+        public item_PU GetByIndex(int index)
+        {
+            Node current = front;
+            int currentIndex = 0;
+
+            while (current != null)
+            {
+                if (currentIndex == index)
+                {
+                    return current.element;
+                }
+                current = current.Next;
+                currentIndex++;
+            }
+
+            return null; // Index out of range
+        }
+
+        // Get count of elements
+        public int Count()
+        {
+            Node current = front;
+            int count = 0;
+
+            while (current != null)
+            {
+                count++;
+                current = current.Next;
+            }
+
+            return count;
         }
     }
 }

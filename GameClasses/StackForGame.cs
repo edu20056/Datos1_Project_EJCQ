@@ -51,5 +51,22 @@ namespace Windows_Forms_Attempt
                 return stack[top];
             }
         }
+
+        // Method to get the count of elements in the stack
+        public int Count()
+        {
+            return top + 1;
+        }
+
+        // Method to get the item at a specific index
+        public item_PU GetIndex(int index)
+        {
+            if (index < 0 || index > top)
+            {
+                Console.WriteLine("Index out of range");
+                return null;
+            }
+            return stack[index];
+        }
     }
 }
