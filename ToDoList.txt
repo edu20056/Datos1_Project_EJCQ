@@ -1,6 +1,9 @@
 Sobre los bots:
     -Realizar dropeo de itemes al morir.
 
+Sobre player:
+    -Si tengo escudo y caigo sobre objeto, solo resto uno a escudo.
+
 CAMBIAR BOT SPEED A NORMAL
 SETEAR SPAWN DE OBJETOS CON INTERVALO DECENTE
 CAMBIAR TIMER DE CONSUEM ITEMS A 1 SEG
