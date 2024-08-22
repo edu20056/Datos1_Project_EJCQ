@@ -1,7 +1,6 @@
-Sobre el main Character:
-    -Consumir objetos con su lógica
-        -Consumir item esperar un segundo.
-
-
 Sobre los bots:
     -Realizar dropeo de itemes al morir.
+
+CAMBIAR BOT SPEED A NORMAL
+SETEAR SPAWN DE OBJETOS CON INTERVALO DECENTE
+CAMBIAR TIMER DE CONSUEM ITEMS A 1 SEG

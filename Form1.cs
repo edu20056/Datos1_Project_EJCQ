@@ -28,6 +28,7 @@ namespace Windows_Forms_Attempt
         private Estela estela;
         private System.Windows.Forms.Timer timer_player;
         private System.Windows.Forms.Timer Spaw_items_powerups;
+        private System.Windows.Forms.Timer consume_wait;
         private System.Windows.Forms.Timer[] botTimers;
         private int executionsPerSecond;
         private Button quit_Button;
@@ -36,6 +37,7 @@ namespace Windows_Forms_Attempt
         private Label current_shield_num;
         private int rest_fuel;
         private Random random = new Random();
+        private bool can_consume = true;
         private List<int> lista_actual_move_bots = new List<int>(); //this is a list of integers that relate how many times has a bot moved, 
         //if it reaches a certain number, which is the index number in bots_random_distance, it will change direction and reset the integer index
         //related to that bot. Logic in Set_bots_movement().
@@ -67,6 +69,10 @@ namespace Windows_Forms_Attempt
             Spaw_items_powerups.Tick += new EventHandler(Spaw_Consumables);
             Spaw_items_powerups.Start();
 
+            consume_wait = new System.Windows.Forms.Timer();
+            consume_wait.Interval = 4000;
+            consume_wait.Tick += new EventHandler(Can_Consume_Check);
+
 
             // Crear e inicializar los temporizadores de los bots
             int botCount = 4;
@@ -87,6 +93,11 @@ namespace Windows_Forms_Attempt
             this.KeyDown += new KeyEventHandler(Movement_Key_detector_Consume_Items);
 
             InitializeControls();
+        }
+        public void Can_Consume_Check(object sender, EventArgs e)
+        {
+            can_consume = true;
+            consume_wait.Stop();
         }
         public void Set_bots_movement_Fuel_check(object sender, EventArgs e, int k)
          {
@@ -676,25 +687,31 @@ namespace Windows_Forms_Attempt
                     {
                         PriorityQueue list_items = List_Items_All_Characters[4];
                         item_PU top = list_items.Front();
-                        if (top.Get_value() == 1)
+                        if (top.Get_value() == 1 && can_consume)
                         {
                             Add_fuel();
                             Show_Items_On_grid();
+                            can_consume = false;
+                            consume_wait.Start();
+                            list_items.Dequeue();
                         }
-                        else if (top.Get_value() == 2)
+                        else if (top.Get_value() == 2 && can_consume)
                         {
                             Add_One_Stels();
                             Show_Items_On_grid();
+                            can_consume = false;
+                            consume_wait.Start();
+                            list_items.Dequeue();
                         }
-                        list_items.Dequeue();
                         Clear_PictureBoxes_For_Items();
+                        Show_Items_On_grid();
                     }
                     catch
                     {
                         
                     }
                     break;
-                case Keys.R:
+                case Keys.Q:
                     try
                     {
                         ArrayStack list_items = List_Power_Ups_All_Characters[4];
@@ -711,11 +728,20 @@ namespace Windows_Forms_Attempt
                         }
                         list_items.Pop();
                         Clear_PictureBoxes_For_PU();
+                        Show_PowerUps_On_grid();
                     }
                     catch
                     {
                         
                     }
+                    break;
+                case Keys.Y: //Change PowerUps Order
+                    ArrayStack list_items_x = List_Power_Ups_All_Characters[4];
+                    Clear_PictureBoxes_For_PU();
+                    list_items_x.Set_bottom_to_top();
+                    Clear_PictureBoxes_For_PU();
+                    Show_PowerUps_On_grid();
+
                     break;
                 case Keys.X:
                     timer_player.Stop();
