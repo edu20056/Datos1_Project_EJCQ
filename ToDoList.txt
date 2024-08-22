@@ -1,8 +1,7 @@
 Sobre el main Character:
-    -Hace falta la implementación de pila para powerups.
-    -Hace falta implementacion de cola para itemes.
+    -Consumir objetos con su lógica
+        -Consumir item esperar un segundo.
+
 
 Sobre los bots:
-    -Hace falta la implementación de pila para powerups.
-    -Hace falta implementacion de cola para itemes.
     -Realizar dropeo de itemes al morir.

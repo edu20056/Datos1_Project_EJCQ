@@ -37,6 +37,10 @@ namespace Windows_Forms_Attempt
                 this.speed = newSpeed;
             }
         }
+        public int GetSpeed()
+        {
+            return this.speed;
+        }
 
         public int Get_fuel()
         {

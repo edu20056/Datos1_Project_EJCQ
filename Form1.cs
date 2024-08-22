@@ -24,15 +24,16 @@ namespace Windows_Forms_Attempt
         private List<item_PU> All_items_and_powerups = new List<item_PU>(); //List with all items and powerups presented.
         private int ref_it_pu = 0; //reference for using PictureBox when spawning item of power up.
         private List<ArrayGrid.Node> nodes; //Array with nodes for creating map.
+        private int current_shield = 0;
         private Estela estela;
         private System.Windows.Forms.Timer timer_player;
         private System.Windows.Forms.Timer Spaw_items_powerups;
         private System.Windows.Forms.Timer[] botTimers;
         private int executionsPerSecond;
-        private TextBox speedTextBox;
-        private Button updateSpeedButton;
         private Button quit_Button;
-        private TextBox current_fuel;
+        private Label current_fuel;
+        private Label current_speed;
+        private Label current_shield_num;
         private int rest_fuel;
         private Random random = new Random();
         private List<int> lista_actual_move_bots = new List<int>(); //this is a list of integers that relate how many times has a bot moved, 
@@ -75,7 +76,7 @@ namespace Windows_Forms_Attempt
             {
                 int bot_speed = random.Next(299, 401);
                 botTimers[i] = new System.Windows.Forms.Timer();
-                botTimers[i].Interval = 1000000;//bot_speed;
+                botTimers[i].Interval = 10000; //bot_speed;
                 list_bots[i].SetSpeed(bot_speed);
                 int botIndex = i; // Capturar la variable en el contexto local
                 botTimers[i].Tick += (sender, e) => Set_bots_movement_Fuel_check(sender, e, botIndex);
@@ -83,7 +84,7 @@ namespace Windows_Forms_Attempt
             }
             
             this.KeyPreview = true;
-            this.KeyDown += new KeyEventHandler(Movement_Key_detector);
+            this.KeyDown += new KeyEventHandler(Movement_Key_detector_Consume_Items);
 
             InitializeControls();
         }
@@ -168,19 +169,13 @@ namespace Windows_Forms_Attempt
         {
             
             int fuel = this.motorcycle.Get_fuel();
-
-            // Initialize the TextBox for changing speed
-            speedTextBox = new TextBox();
-            speedTextBox.Location = new Point(1200, 200);
-            speedTextBox.Size = new Size(100, 20);
-            this.Controls.Add(speedTextBox);
-
-            // Initialize the Button for making the update in the speed
-            updateSpeedButton = new Button();
-            updateSpeedButton.Text = "Update Speed";
-            updateSpeedButton.Location = new Point(1200, 400);
-            updateSpeedButton.Click += new EventHandler(UpdateSpeedButton_Click);
-            this.Controls.Add(updateSpeedButton);
+            int speed_act = this.motorcycle.GetSpeed();
+        
+            TextBox reference = new TextBox();
+            reference.ReadOnly = true;
+            reference.Size = new Size(1,1);
+            reference.Location = new System.Drawing.Point(1200,1200);
+            this.Controls.Add(reference);
 
             // Initialize Button for exiting the game.
             quit_Button = new Button();
@@ -191,32 +186,28 @@ namespace Windows_Forms_Attempt
             this.Controls.Add(quit_Button);
             
             // Configure the message box
-            this.current_fuel = new TextBox();
-            current_fuel.ReadOnly = true;
+            this.current_fuel = new Label();
             current_fuel.Text = "The current fue is " + fuel + ".";
             current_fuel.Size = new Size(150,50);
             current_fuel.Location = new System.Drawing.Point(1200,550);
             this.Controls.Add(current_fuel);
+
+            this.current_speed = new Label();
+            current_speed.Text = "Actual speed is " + executionsPerSecond + " movements per second.";
+            current_speed.Size = new Size(270,50);
+            current_speed.Location = new System.Drawing.Point(1200,450);
+            this.Controls.Add(current_speed);
+
+            this.current_shield_num = new Label();
+            current_shield_num.Text = "The amount of shields is " + current_shield + ".";
+            current_shield_num.Size = new Size(150,50);
+            current_shield_num.Location = new System.Drawing.Point(1200,350);
+            this.Controls.Add(current_shield_num);
+
         }
         public void Quit_Game(object sender, EventArgs e)
         {
             Application.Exit();
-        }
-        private void UpdateSpeedButton_Click(object sender, EventArgs e) //Updates speed value
-        {
-            // Update motorcycle speed and timer interval based on the value in the TextBox
-            int newSpeed;
-            if (int.TryParse(speedTextBox.Text, out newSpeed) && newSpeed > 0) //Transforms current string in speedTextBox into int called newSpeed
-            {
-                this.motorcycle.SetSpeed(newSpeed);
-                executionsPerSecond = newSpeed; // Use the new speed as the execution rate
-
-                UpdateTimerInterval(); // Update the timer interval based on the new speed
-            }
-            else
-            {
-                MessageBox.Show("Please enter a valid positive integer.");
-            }
         }
         private void Colisions_With_Consumable(Object npc, int indicator)
         {
@@ -246,7 +237,6 @@ namespace Windows_Forms_Attempt
                             List_Items_All_Characters[indicator].Enqueue(item_PU);
                             item_PU.Change_Position(nodes,-100,-100);
                             Show_Items_On_grid();
-                            Show_PowerUps_On_grid();
                         }
 
                     }
@@ -254,7 +244,6 @@ namespace Windows_Forms_Attempt
                     {
                         List_Power_Ups_All_Characters[indicator].Push(item_PU);
                         item_PU.Change_Position(nodes,-100,-100);
-                        Show_Items_On_grid();
                         Show_PowerUps_On_grid();
                     }
                 }
@@ -436,13 +425,22 @@ namespace Windows_Forms_Attempt
                 MessageBox.Show("Win, you managed to kill all enemies!");
             }
         }
-        private void UpdateTimerInterval() //This function changes directly the execution per second in terms of movement. 
+        public void UpdateTimerInterval() //This function changes directly the execution per second in terms of movement. 
         {
             if (executionsPerSecond > 0)
             {
                 timer_player.Interval = 1000 / executionsPerSecond; // Update interval to match new speed
             }
         }
+        public void Update_Spped()
+        {
+            current_speed.Text = "Actual speed is " + executionsPerSecond + " movements per second.";
+        }
+        public void Update_Shield()
+        {
+            current_shield_num.Text = "The amount of shields is " + current_shield + ".";
+        }
+        
         private void Fuel_Check_And_Player_Movement(object sender, EventArgs e)
         {
             // Move the motorcycle automatically
@@ -480,11 +478,11 @@ namespace Windows_Forms_Attempt
             }
         }
         
-        
-        
+        //SECTIONS N//
         // CREATION OF ITEMS AND POWERUPS ON GRID//
         public void Show_Items_On_grid()
         {
+        
             PriorityQueue list_items = List_Items_All_Characters[4];
             int colocator = 0;
 
@@ -510,6 +508,7 @@ namespace Windows_Forms_Attempt
                 Create_Image_for_Items_On_grid(image_str, colocator, 1500);
                 colocator = Increase_colocator(colocator);
             }
+
         }
         private void Clear_PictureBoxes_For_Items()
         {
@@ -537,7 +536,6 @@ namespace Windows_Forms_Attempt
 
             this.Controls.Add(box);
         }
-
         public void Show_PowerUps_On_grid()
         {
             ArrayStack list_stack = List_Power_Ups_All_Characters[4];
@@ -573,7 +571,7 @@ namespace Windows_Forms_Attempt
                 Location = new Point(x, n * 25 + 25),
                 BackColor = Color.Transparent,
                 Image = System.Drawing.Image.FromFile(s),
-                Name = $"item_{n}" // Asignar un nombre único basado en colocator
+                Name = $"PU_{n}" // Asignar un nombre único basado en colocator
             };
 
             this.Controls.Add(box);
@@ -594,8 +592,43 @@ namespace Windows_Forms_Attempt
         {
             return num + 1;
         }
+        //END SECTION N//
 
-        //
+        //SECTION N+1//
+        //CONSUME OBJECTS//
+        public void Add_fuel()
+        {
+            int actual_fuel = this.motorcycle.Get_fuel();
+            int addition = random.Next(10, 15);
+            actual_fuel = actual_fuel + addition;
+            this.motorcycle.Set_fuel(actual_fuel);
+        }
+        public void Add_One_Stels()
+        {
+            PictureBox pictureBox = new PictureBox();
+            pictureBox.Size = new Size(50, 50);
+            pictureBox.BackColor = Color.Transparent;
+            this.Controls.Add(pictureBox);
+            pictureBox.BringToFront(); // Asegurar que el PictureBox esté al frente
+
+            estela = new Estela(pictureBox, this.motorcycle.Get_x_player(), this.motorcycle.Get_y_player());
+            this.motorcycle.Add_Stels();
+            player.Add(estela);
+            All_Objects_For_Colisions.Add(estela);
+        }
+        public void Use_PU_Shield()
+        {
+            current_shield++;
+            Update_Shield();
+        }
+        public void Use_PU_Speed()
+        {
+            int add_speed = random.Next(1, 3);
+            int actual_speed = executionsPerSecond;
+            executionsPerSecond = actual_speed + add_speed;
+            Update_Spped();
+        }
+        //END SECTION N+1//
         private void UpdateEstelas_Player() //Moves stelas for player
         {
             // Move the last estela first
@@ -617,7 +650,7 @@ namespace Windows_Forms_Attempt
                 firstEstela.Set_Dirr(this.motorcycle.Get_Move_Indicator());
             }
         }
-        private void Movement_Key_detector(object sender, KeyEventArgs e) //if any key is pressed, changes players direction
+        private void Movement_Key_detector_Consume_Items(object sender, KeyEventArgs e) //if any key is pressed, changes players direction
         {
             // Change direction based on the arrow key pressed
             switch (e.KeyCode)
@@ -637,6 +670,55 @@ namespace Windows_Forms_Attempt
                 case Keys.Right:
                     this.motorcycle.Move_Image(0);
                     this.motorcycle.Change_Direction(1);
+                    break;
+                case Keys.F: //Consume item
+                    try
+                    {
+                        PriorityQueue list_items = List_Items_All_Characters[4];
+                        item_PU top = list_items.Front();
+                        if (top.Get_value() == 1)
+                        {
+                            Add_fuel();
+                            Show_Items_On_grid();
+                        }
+                        else if (top.Get_value() == 2)
+                        {
+                            Add_One_Stels();
+                            Show_Items_On_grid();
+                        }
+                        list_items.Dequeue();
+                        Clear_PictureBoxes_For_Items();
+                    }
+                    catch
+                    {
+                        
+                    }
+                    break;
+                case Keys.R:
+                    try
+                    {
+                        ArrayStack list_items = List_Power_Ups_All_Characters[4];
+                        item_PU top = list_items.Top();
+                        if (top.Get_value() == 4)
+                        {
+                            Use_PU_Speed();
+                            Show_PowerUps_On_grid();
+                        }
+                        else if (top.Get_value() == 5)
+                        {
+                            Use_PU_Shield();
+                            Show_PowerUps_On_grid();
+                        }
+                        list_items.Pop();
+                        Clear_PictureBoxes_For_PU();
+                    }
+                    catch
+                    {
+                        
+                    }
+                    break;
+                case Keys.X:
+                    timer_player.Stop();
                     break;
             }
         }
@@ -706,7 +788,7 @@ namespace Windows_Forms_Attempt
             };
 
             player = new SingleLinkedForGame();
-            this.motorcycle = new Motorcycle(executionsPerSecond, 0, 1000, images_player, this.pictureBox1, 1);
+            this.motorcycle = new Motorcycle(executionsPerSecond, 0, 90, images_player, this.pictureBox1, 1);
             player.Add(this.motorcycle);
             All_Objects_For_Colisions.Add(this.motorcycle);
 
