@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace Windows_Forms_Attempt
@@ -30,6 +31,7 @@ namespace Windows_Forms_Attempt
         private System.Windows.Forms.Timer Spaw_items_powerups;
         private System.Windows.Forms.Timer consume_wait;
         private System.Windows.Forms.Timer[] botTimers;
+        private bool can_be_killed = true;
         private int executionsPerSecond;
         private Button quit_Button;
         private Label current_fuel;
@@ -72,7 +74,6 @@ namespace Windows_Forms_Attempt
             consume_wait = new System.Windows.Forms.Timer();
             consume_wait.Interval = 4000;
             consume_wait.Tick += new EventHandler(Can_Consume_Check);
-
 
             // Crear e inicializar los temporizadores de los bots
             int botCount = 4;
@@ -309,13 +310,27 @@ namespace Windows_Forms_Attempt
                             MotorcycleBot bot = (MotorcycleBot)objecto;
                             if (bot.Get_x_bot() == moto.Get_x_player() && bot.Get_y_bot() == moto.Get_y_player())
                             {
-                                timer_player.Stop();
-                                Spaw_items_powerups.Stop();
-                                foreach (System.Windows.Forms.Timer timer in botTimers)
+                                if (current_shield > 0 && can_be_killed)
                                 {
-                                    timer.Stop();
+                                    current_shield--;
+                                    can_be_killed = false;
+                                    Update_Shield();
                                 }
-                                MessageBox.Show("Game Over! You collided with a game Bot.");
+                                else if (can_be_killed && current_shield == 0)
+                                {
+                                    timer_player.Stop();
+                                    Spaw_items_powerups.Stop();
+                                    foreach (System.Windows.Forms.Timer timer in botTimers)
+                                    {
+                                        timer.Stop();
+                                    }
+                                    MessageBox.Show("Game Over! You collided with a curious object.");  
+                                }                                
+                                else
+                                {
+                                    can_be_killed = true;
+                                }
+
                             }
                         }
                         catch
@@ -327,14 +342,29 @@ namespace Windows_Forms_Attempt
                             }
                             else if (estela.Get_X_est() == moto.Get_x_player() && estela.Get_Y_est() == moto.Get_y_player())
                             {
-                                timer_player.Stop();
-                                Spaw_items_powerups.Stop();
-                                foreach (System.Windows.Forms.Timer timer in botTimers)
+
+                                if (current_shield > 0 && can_be_killed)
                                 {
-                                    timer.Stop();
+                                    current_shield--;
+                                    can_be_killed = false;
+                                    Update_Shield();
                                 }
-                                MessageBox.Show("Game Over! You collided with a curious object.");
+                                else if (can_be_killed && current_shield == 0)
+                                {
+                                    timer_player.Stop();
+                                    Spaw_items_powerups.Stop();
+                                    foreach (System.Windows.Forms.Timer timer in botTimers)
+                                    {
+                                        timer.Stop();
+                                    }
+                                    MessageBox.Show("Game Over! You collided with a curious object.");   
+                                }
+                                else
+                                {
+                                    can_be_killed = true;
+                                }
                             }
+
                         }
                     }
                 }
@@ -365,7 +395,6 @@ namespace Windows_Forms_Attempt
                             botTimers[bot.Get_position_list_indicator()].Stop();
                             bot.Move_Image(4);
                             All_Objects_For_Colisions.Remove(bot);
-
                             Check_Killed_Bots();
                         }
                     }
