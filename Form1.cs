@@ -22,13 +22,13 @@ namespace Windows_Forms_Attempt
         private List<PriorityQueue> List_Items_All_Characters = new List<PriorityQueue>(); //List with all item Queue list for each bot and the player.
         private List<ArrayStack> List_Power_Ups_All_Characters = new List<ArrayStack>(); //List with all power ups for each bot and the player.
         private List<PictureBox> Boxes_for_items_and_powerups = new List<PictureBox>(); //List that contains all Pictures boxes of all items and powerups
-        private List<PictureBox> Boxes_ReDrops = new List<PictureBox>(); //List that contains all Pictures boxes of all items and powerups
+        private List<PictureBox> Boxes_ReDrops = new List<PictureBox>(); //List that contains all Pictures boxes of all items and powerups.
         private List<item_PU> All_items_and_powerups = new List<item_PU>(); //List with all items and powerups presented.
         private int ref_it_pu = 0; //reference for using PictureBox when spawning item of power up.
         private List<ArrayGrid.Node> nodes; //Array with nodes for creating map.
-        private int current_shield = 0;
-        private Estela estela;
-        private System.Windows.Forms.Timer timer_player;
+        private int current_shield = 0; //Gives the number of the shields consumed that hasnt been used.
+        private Estela estela; // Generic objet for adding to the bots and the player.
+        private System.Windows.Forms.Timer timer_player; 
         private System.Windows.Forms.Timer Spaw_items_powerups;
         private System.Windows.Forms.Timer consume_wait;
         private System.Windows.Forms.Timer[] botTimers;
@@ -68,12 +68,12 @@ namespace Windows_Forms_Attempt
             timer_player.Start();
 
             Spaw_items_powerups = new System.Windows.Forms.Timer();
-            Spaw_items_powerups.Interval = 5000;
+            Spaw_items_powerups.Interval = 4000;
             Spaw_items_powerups.Tick += new EventHandler(Spaw_Consumables);
             Spaw_items_powerups.Start();
 
             consume_wait = new System.Windows.Forms.Timer();
-            consume_wait.Interval = 4000;
+            consume_wait.Interval = 2000;
             consume_wait.Tick += new EventHandler(Can_Consume_Check);
 
             // Crear e inicializar los temporizadores de los bots
@@ -84,7 +84,7 @@ namespace Windows_Forms_Attempt
             {
                 int bot_speed = random.Next(299, 401);
                 botTimers[i] = new System.Windows.Forms.Timer();
-                botTimers[i].Interval = bot_speed; //10000;//
+                botTimers[i].Interval = bot_speed; 
                 list_bots[i].SetSpeed(bot_speed);
                 int botIndex = i; // Capturar la variable en el contexto local
                 botTimers[i].Tick += (sender, e) => Set_bots_movement_Fuel_check(sender, e, botIndex);
@@ -280,8 +280,10 @@ namespace Windows_Forms_Attempt
                 MotorcycleBot bot = (MotorcycleBot)npc;
                 int x = bot.Get_x_bot();
                 int y = bot.Get_y_bot();
-                foreach (item_PU item_PU in All_items_and_powerups)
+                int j = All_items_and_powerups.Count();
+                for (int i = 0; i< j; i++)
                 {
+                    item_PU item_PU = All_items_and_powerups[i];
                     int num = item_PU.Get_value();
                     if (num < 4 && item_PU.Get_x() == x && item_PU.Get_y() == y)
                     {
@@ -289,9 +291,10 @@ namespace Windows_Forms_Attempt
                         {
                             int ind = bot.Get_position_list_indicator();
                             botTimers[ind].Stop();
-                            //Spawn_Obj_Dead_Bot(bot.Get_position_list_indicator());
                             bot.Move_Image(4);
                             All_Objects_For_Colisions.Remove(bot);
+                            Check_Killed_Bots();
+                            Spawn_Obj_Dead_Bot(ind);
                         }
                         else
                         {
@@ -305,7 +308,6 @@ namespace Windows_Forms_Attempt
                         item_PU.Change_Position(nodes,-100,-100);
                     }
                 }
-
             }
         }
         private void Analice_Colisions(object ob, SingleLinkedForGame list)
@@ -411,9 +413,9 @@ namespace Windows_Forms_Attempt
                         {
                             botTimers[bot.Get_position_list_indicator()].Stop();
                             bot.Move_Image(4);
-                            //Spawn_Obj_Dead_Bot(bot.Get_position_list_indicator());
                             All_Objects_For_Colisions.Remove(bot);
                             Check_Killed_Bots();
+                            Spawn_Obj_Dead_Bot(bot.Get_position_list_indicator());
                         }
                     }
                     catch (InvalidCastException)
@@ -425,12 +427,12 @@ namespace Windows_Forms_Attempt
                                 bot.Move_Image(4);
                                 botTimers[bot.Get_position_list_indicator()].Stop();
                                 All_Objects_For_Colisions.Remove(bot);
-                                //Spawn_Obj_Dead_Bot(bot.Get_position_list_indicator());
 
                                 botTimers[bot_colision.Get_position_list_indicator()].Stop();
                                 bot_colision.Move_Image(4);
                                 All_Objects_For_Colisions.Remove(bot_colision);
-                                //Spawn_Obj_Dead_Bot(bot_colision.Get_position_list_indicator());
+                                Spawn_Obj_Dead_Bot(bot_colision.Get_position_list_indicator());
+                                Spawn_Obj_Dead_Bot(bot.Get_position_list_indicator());
 
                                 Check_Killed_Bots();
                             }
@@ -959,7 +961,7 @@ namespace Windows_Forms_Attempt
         public void Spawn_items(int num)
         {
             bool isValidSpawnLocation;
-            int item = random.Next(1, 4);
+            int item = random.Next(3, 4);
             int x_it;
             int y_it;
 
