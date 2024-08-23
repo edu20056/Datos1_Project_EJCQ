@@ -22,6 +22,7 @@ namespace Windows_Forms_Attempt
         private List<PriorityQueue> List_Items_All_Characters = new List<PriorityQueue>(); //List with all item Queue list for each bot and the player.
         private List<ArrayStack> List_Power_Ups_All_Characters = new List<ArrayStack>(); //List with all power ups for each bot and the player.
         private List<PictureBox> Boxes_for_items_and_powerups = new List<PictureBox>(); //List that contains all Pictures boxes of all items and powerups
+        private List<PictureBox> Boxes_ReDrops = new List<PictureBox>(); //List that contains all Pictures boxes of all items and powerups
         private List<item_PU> All_items_and_powerups = new List<item_PU>(); //List with all items and powerups presented.
         private int ref_it_pu = 0; //reference for using PictureBox when spawning item of power up.
         private List<ArrayGrid.Node> nodes; //Array with nodes for creating map.
@@ -83,7 +84,7 @@ namespace Windows_Forms_Attempt
             {
                 int bot_speed = random.Next(299, 401);
                 botTimers[i] = new System.Windows.Forms.Timer();
-                botTimers[i].Interval = 10000; //bot_speed;
+                botTimers[i].Interval = bot_speed; //10000;//
                 list_bots[i].SetSpeed(bot_speed);
                 int botIndex = i; // Capturar la variable en el contexto local
                 botTimers[i].Tick += (sender, e) => Set_bots_movement_Fuel_check(sender, e, botIndex);
@@ -236,13 +237,27 @@ namespace Windows_Forms_Attempt
                     {
                         if (num == 3) //Colision with bomb
                         {
-                            timer_player.Stop();
-                            Spaw_items_powerups.Stop();
-                            foreach (System.Windows.Forms.Timer timer in botTimers)
+                            if (current_shield > 0 && can_be_killed)
                             {
-                                timer.Stop();
+                                current_shield--;
+                                can_be_killed = false;
+                                Update_Shield();
                             }
-                            MessageBox.Show("Game Over! You exploted.");
+                            else if (can_be_killed && current_shield == 0)
+                            {
+                                timer_player.Stop();
+                                Spaw_items_powerups.Stop();
+                                foreach (System.Windows.Forms.Timer timer in botTimers)
+                                {
+                                    timer.Stop();
+                                }
+                                MessageBox.Show("Game Over! You exploded.");  
+                            }                                
+                            else
+                            {
+                                can_be_killed = true;
+                                Colisions_With_Consumable(this.motorcycle, 4);
+                            }
                         }
                         else
                         {
@@ -274,6 +289,7 @@ namespace Windows_Forms_Attempt
                         {
                             int ind = bot.Get_position_list_indicator();
                             botTimers[ind].Stop();
+                            //Spawn_Obj_Dead_Bot(bot.Get_position_list_indicator());
                             bot.Move_Image(4);
                             All_Objects_For_Colisions.Remove(bot);
                         }
@@ -329,6 +345,7 @@ namespace Windows_Forms_Attempt
                                 else
                                 {
                                     can_be_killed = true;
+                                    Analice_Colisions(moto, list);
                                 }
 
                             }
@@ -394,26 +411,32 @@ namespace Windows_Forms_Attempt
                         {
                             botTimers[bot.Get_position_list_indicator()].Stop();
                             bot.Move_Image(4);
+                            //Spawn_Obj_Dead_Bot(bot.Get_position_list_indicator());
                             All_Objects_For_Colisions.Remove(bot);
                             Check_Killed_Bots();
                         }
                     }
-                    catch
+                    catch (InvalidCastException)
                     {
-                        MotorcycleBot bot_colision = (MotorcycleBot)objecto;
-                        if (bot_colision.Get_x_bot() == bot.Get_x_bot() && bot_colision.Get_y_bot() == bot.Get_y_bot())
+                        if (objecto is MotorcycleBot bot_colision)
                         {
-                            bot.Move_Image(4);
-                            botTimers[bot.Get_position_list_indicator()].Stop();
-                            All_Objects_For_Colisions.Remove(bot);
+                            if (bot_colision.Get_x_bot() == bot.Get_x_bot() && bot_colision.Get_y_bot() == bot.Get_y_bot())
+                            {
+                                bot.Move_Image(4);
+                                botTimers[bot.Get_position_list_indicator()].Stop();
+                                All_Objects_For_Colisions.Remove(bot);
+                                //Spawn_Obj_Dead_Bot(bot.Get_position_list_indicator());
 
-                            botTimers[bot_colision.Get_position_list_indicator()].Stop();
-                            bot_colision.Move_Image(4);
-                            All_Objects_For_Colisions.Remove(bot_colision);
+                                botTimers[bot_colision.Get_position_list_indicator()].Stop();
+                                bot_colision.Move_Image(4);
+                                All_Objects_For_Colisions.Remove(bot_colision);
+                                //Spawn_Obj_Dead_Bot(bot_colision.Get_position_list_indicator());
 
-                            Check_Killed_Bots();
+                                Check_Killed_Bots();
+                            }
                         }
                     }
+
                 }
 
             }
@@ -519,7 +542,7 @@ namespace Windows_Forms_Attempt
         }
         
         //SECTIONS N//
-        // CREATION OF ITEMS AND POWERUPS ON GRID//
+        // CREATION OF PLAYERS ITEMS AND POWERUPS ON GRID//
         public void Show_Items_On_grid()
         {
         
@@ -641,32 +664,60 @@ namespace Windows_Forms_Attempt
             int actual_fuel = this.motorcycle.Get_fuel();
             int addition = random.Next(10, 15);
             actual_fuel = actual_fuel + addition;
-            this.motorcycle.Set_fuel(actual_fuel);
+            if (actual_fuel > 100)
+            {
+                this.motorcycle.Set_fuel(100);
+            }
+            else
+            {
+                this.motorcycle.Set_fuel(actual_fuel);
+            }
         }
         public void Add_One_Stels()
         {
-            PictureBox pictureBox = new PictureBox();
-            pictureBox.Size = new Size(50, 50);
-            pictureBox.BackColor = Color.Transparent;
-            this.Controls.Add(pictureBox);
-            pictureBox.BringToFront(); // Asegurar que el PictureBox esté al frente
+            int aumento = random.Next(1,5);
+            for (int i = 0; i < aumento; i++)
+            {
+                PictureBox pictureBox = new PictureBox();
+                pictureBox.Size = new Size(50, 50);
+                pictureBox.BackColor = Color.Transparent;
+                this.Controls.Add(pictureBox);
+                pictureBox.BringToFront(); // Asegurar que el PictureBox esté al frente
 
-            estela = new Estela(pictureBox, this.motorcycle.Get_x_player(), this.motorcycle.Get_y_player());
-            this.motorcycle.Add_Stels();
-            player.Add(estela);
-            All_Objects_For_Colisions.Add(estela);
+                estela = new Estela(pictureBox, this.motorcycle.Get_x_player(), this.motorcycle.Get_y_player());
+                this.motorcycle.Add_Stels();
+                player.Add(estela);
+                All_Objects_For_Colisions.Add(estela);
+            }
+
         }
         public void Use_PU_Shield()
         {
+            string[] images_player = new string[]
+            {
+                "Imagenes/jugador/Purple/moto_jugador_derecha_purple.png",
+                "Imagenes/jugador/Purple/moto_jugador_izquierda_purple.png",
+                "Imagenes/jugador/Purple/moto_jugador_arriba_purple.png",
+                "Imagenes/jugador/Purple/moto_jugador_abajo_purple.png"
+            };
             current_shield++;
             Update_Shield();
+            this.motorcycle.Set_New_Image_List(images_player);
         }
         public void Use_PU_Speed()
         {
+            string[] images_player = new string[]
+            {
+                "Imagenes/jugador/Yellow/moto_jugador_derecha_yellow.png",
+                "Imagenes/jugador/Yellow/moto_jugador_izquierda_yellow.png",
+                "Imagenes/jugador/Yellow/moto_jugador_arriba_yellow.png",
+                "Imagenes/jugador/Yellow/moto_jugador_abajo_yellow.png"
+            };
             int add_speed = random.Next(1, 3);
             int actual_speed = executionsPerSecond;
             executionsPerSecond = actual_speed + add_speed;
             Update_Spped();
+            this.motorcycle.Set_New_Image_List(images_player);
         }
         //END SECTION N+1//
         private void UpdateEstelas_Player() //Moves stelas for player
@@ -718,11 +769,15 @@ namespace Windows_Forms_Attempt
                         item_PU top = list_items.Front();
                         if (top.Get_value() == 1 && can_consume)
                         {
-                            Add_fuel();
-                            Show_Items_On_grid();
-                            can_consume = false;
-                            consume_wait.Start();
-                            list_items.Dequeue();
+                            if (this.motorcycle.Get_fuel() < 100) //Check if fuel tank is full
+                            {
+                                Add_fuel();
+                                Show_Items_On_grid();
+                                can_consume = false;
+                                consume_wait.Start();
+                                list_items.Dequeue();
+                            }
+
                         }
                         else if (top.Get_value() == 2 && can_consume)
                         {
@@ -816,6 +871,14 @@ namespace Windows_Forms_Attempt
                 this.Controls.Add(pictureBox);
             } 
 
+            for (int j = 0; j < 50; j++)
+            {
+                PictureBox pictureBox = new PictureBox();
+                Boxes_ReDrops.Add(pictureBox);
+                pictureBox.Size = new Size(50, 50);
+                pictureBox.BackColor = Color.Transparent; 
+                this.Controls.Add(pictureBox);
+            } 
             // Implementation of boxes for stels
             for (int j = 0; j < 30; j++) 
             {
@@ -1035,6 +1098,106 @@ namespace Windows_Forms_Attempt
             powerup.Change_Position(nodes, x_pu, y_pu);
             All_items_and_powerups.Add(powerup);
         }
+        public void Spawn_Obj_Dead_Bot(int ind)
+        {
+            PriorityQueue list_items = List_Items_All_Characters[ind];
+            ArrayStack list_PU = List_Power_Ups_All_Characters[ind];
+
+            int count = list_items.Count();
+            for (int i = 0; i < count; i++)
+            {
+                item_PU item_PU = list_items.GetByIndex(i);
+                Random_Drop_Items_Or_PU(item_PU);
+                list_items.Dequeue();
+            }
+
+            int count2 = list_PU.Count();
+            for (int i = 0; i < count2; i++)
+            {
+                item_PU item_PU = list_PU.GetIndex(i);
+                Random_Drop_Items_Or_PU(item_PU);
+                list_PU.Pop();
+            }
+        }
+        public void Random_Drop_Items_Or_PU(item_PU obj)
+        {
+            int x = random.Next(0, 24);
+            int y = random.Next(0, 16);
+            bool is_ValidSpawnLocation_for_drop = true; // Suponemos que la posición es válida
+            do
+            {
+                // Verificar colisiones con otros objetos
+                foreach (Object objecto in All_Objects_For_Colisions)
+                {
+                    try
+                    {
+                        Motorcycle motorcycle = objecto as Motorcycle;
+                        if (motorcycle != null && motorcycle.Get_x_player() == x && motorcycle.Get_y_player() == y)
+                        {
+                            is_ValidSpawnLocation_for_drop = false;
+                            break;
+                        }
+
+                        MotorcycleBot bot = objecto as MotorcycleBot;
+                        if (bot != null && bot.Get_x_bot() == x && bot.Get_y_bot() == y)
+                        {
+                            is_ValidSpawnLocation_for_drop = false;
+                            break;
+                        }
+
+                        Estela estela = objecto as Estela;
+                        if (estela != null && estela.Get_X_est() == x && estela.Get_Y_est() == y)
+                        {
+                            is_ValidSpawnLocation_for_drop = false;
+                            break;
+                        }
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+
+                // Verificar colisiones con ítems y power-ups existentes
+                foreach (Object objectos in All_items_and_powerups)
+                {
+                    try
+                    {
+                        item_PU objec = objectos as item_PU;
+                        if (objec != null && objec.Get_x() == x && objec.Get_y() == y)
+                        {
+                            is_ValidSpawnLocation_for_drop = false;
+                            break;
+                        }
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+            } while (!is_ValidSpawnLocation_for_drop); // Continuar buscando una posición válida
+
+            if (obj != null)
+            {
+                item_PU items = new item_PU(obj.Get_value(), Boxes_for_items_and_powerups[GetFirstUnoccupiedIndex()]);
+                items.Change_Position(nodes, x, y);
+                All_items_and_powerups.Add(items);
+            }
+
+        }
+        public int GetFirstUnoccupiedIndex()
+        {
+            for (int i = 0; i < Boxes_ReDrops.Count; i++)
+            {
+                if (Boxes_ReDrops[i].Image == null) // Si no hay imagen asociada, está desocupado
+                {
+                    return i; // Devuelve el primer índice desocupado encontrado
+                }
+            }
+
+            return -1; // Retorna -1 si no se encuentra ningún índice desocupado
+        }
+
         private void Create_Stels_For_bots(SingleLinkedForGame list, int num_bot, List<PictureBox> estelas_boxes)
         {
             if (num_bot == 1)

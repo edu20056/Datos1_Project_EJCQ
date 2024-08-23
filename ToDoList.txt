@@ -1,5 +1,4 @@
-Sobre los bots:
-    -Realizar dropeo de itemes al morir.
+Arreglas spawn de objetos de Bot al morir.
 
 CAMBIAR BOT SPEED A NORMAL
 SETEAR SPAWN DE OBJETOS CON INTERVALO DECENTE

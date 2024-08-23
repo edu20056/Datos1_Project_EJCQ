@@ -42,6 +42,11 @@ namespace Windows_Forms_Attempt
             return this.speed;
         }
 
+        public void Set_New_Image_List(string[] list)
+        {
+            this.list_images = list;
+        }
+
         public int Get_fuel()
         {
             return this.fuel;
