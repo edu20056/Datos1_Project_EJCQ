@@ -39,7 +39,7 @@ namespace Windows_Forms_Attempt
             if (this.box != null)
             {
                 this.box.Location = new System.Drawing.Point(x * 50, y * 50);
-                this.box.Name = "Player1";
+                this.box.Name = "Estela";
                 this.box.Size = new System.Drawing.Size(50, 50);
                 this.box.SizeMode = PictureBoxSizeMode.StretchImage;
                 this.box.Image = System.Drawing.Image.FromFile("Imagenes/estela.png");

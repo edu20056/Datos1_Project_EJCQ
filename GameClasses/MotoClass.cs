@@ -37,6 +37,15 @@ namespace Windows_Forms_Attempt
                 this.speed = newSpeed;
             }
         }
+        public int GetSpeed()
+        {
+            return this.speed;
+        }
+
+        public void Set_New_Image_List(string[] list)
+        {
+            this.list_images = list;
+        }
 
         public int Get_fuel()
         {
@@ -74,7 +83,7 @@ namespace Windows_Forms_Attempt
                 this.box.Size = new System.Drawing.Size(50, 50);
                 this.box.SizeMode = PictureBoxSizeMode.StretchImage;
                 this.box.Image = System.Drawing.Image.FromFile(list_images[0]);
-                this.box.BackColor = Color.Transparent; // Ensure no background color
+                this.box.BackColor = Color.Transparent; 
             }
         }
 

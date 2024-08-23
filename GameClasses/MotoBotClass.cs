@@ -13,12 +13,14 @@ namespace Windows_Forms_Attempt
         private int y;
         private int move_indicator;
 
+        private int fuel;
         private int position_list_indicator; //Indicates the number of position on SingledLinkedListForPlayers.
 
-        public MotorcycleBot(int speed, int stels, string[] list_images, PictureBox box, int x, int y, int move_indicator, int position_list_indicator)
+        public MotorcycleBot(int speed, int stels, int fuel, string[] list_images, PictureBox box, int x, int y, int move_indicator, int position_list_indicator)
         {
             this.speed = speed;
             this.stels = stels;
+            this.fuel = fuel;
             this.list_images = list_images;
             this.box = box;
             this.x = y;
@@ -30,6 +32,16 @@ namespace Windows_Forms_Attempt
         public void Add_Stels()
         {
             this.stels++;
+        }
+
+        public void Set_Fuel(int newfuel)
+        {
+            this.fuel = newfuel;
+        }
+
+        public int Get_Fuel()
+        {
+            return this.fuel;
         }
 
         public int Get_position_list_indicator()
