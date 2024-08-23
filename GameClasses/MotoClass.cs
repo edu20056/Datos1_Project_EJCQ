@@ -83,7 +83,7 @@ namespace Windows_Forms_Attempt
                 this.box.Size = new System.Drawing.Size(50, 50);
                 this.box.SizeMode = PictureBoxSizeMode.StretchImage;
                 this.box.Image = System.Drawing.Image.FromFile(list_images[0]);
-                this.box.BackColor = Color.Transparent; // Ensure no background color
+                this.box.BackColor = Color.Transparent; 
             }
         }
 

@@ -67,22 +67,21 @@ namespace Windows_Forms_Attempt
             return stack[index];
         }
 
-        // Método para invertir el orden de los elementos en la pila
         public void Set_bottom_to_top()
         {
-            if (top <= 0) // No hay suficientes elementos para mover
+            if (top <= 0) 
                 return;
 
-            // Almacena el último elemento (bottom)
+            // Store the last element (bottom)
             item_PU lastElement = stack[top];
 
-            // Desplaza los elementos hacia la derecha, desde la posición 0 hasta top - 1
+            // Moves elements to the right, from position 0 to top - 1
             for (int i = top; i > 0; i--)
             {
                 stack[i] = stack[i - 1];
             }
-
-            // Coloca el último elemento en la cabeza
+            
+            // Place the last element in the head
             stack[0] = lastElement;
         }
 

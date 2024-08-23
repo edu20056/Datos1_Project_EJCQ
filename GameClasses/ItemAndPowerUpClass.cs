@@ -87,7 +87,7 @@ namespace Windows_Forms_Attempt
                 return;
             }
 
-            else if (current != null) // Place the player on the grid
+            else if (current != null) // Place the itmes/powerup on the grid
             {
                 this.x = x_1;
                 this.y = y_1;

@@ -4,7 +4,7 @@ using Windows_Forms_Attempt;
 
 public class DoubleLinkedList
 {
-    // Clase interna Node
+    // Interal Class Node
     private class Node
     {
         public int Value { get; set; }
@@ -89,7 +89,7 @@ public class DoubleLinkedList
             
         }
         Console.Write("]");
-        Console.WriteLine(); // Para terminar con una nueva línea
+        Console.WriteLine(); 
     }   
 
     // Checks if the list contains a specific element
