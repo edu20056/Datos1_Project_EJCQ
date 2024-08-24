@@ -5,7 +5,7 @@ namespace Windows_Forms_Attempt
         private PictureBox box;
         private int x;
         private int y;
-        int prev_val;
+        private int prev_val;
 
         public Estela(PictureBox box, int x, int y)
         {

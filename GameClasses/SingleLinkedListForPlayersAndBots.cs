@@ -6,13 +6,11 @@ namespace Windows_Forms_Attempt
         {
             public object Value;
             public Node Next;
-            public Node Prev;
 
             public Node(object value)
             {
                 this.Value = value;
                 this.Next = null;
-                this.Prev = null;
             }
         }
 
@@ -50,7 +48,6 @@ namespace Windows_Forms_Attempt
             else
             {
                 this.tail.Next = newNode;
-                newNode.Prev = this.tail;
                 this.tail = newNode;
             }
             this.size++;
@@ -66,11 +63,7 @@ namespace Windows_Forms_Attempt
             if (this.head.Value == element)
             {
                 this.head = this.head.Next;
-                if (this.head != null)
-                {
-                    this.head.Prev = null;
-                }
-                else
+                if (this.head == null)
                 {
                     this.tail = null;
                 }
@@ -83,11 +76,7 @@ namespace Windows_Forms_Attempt
                 if (current.Next.Value == element)
                 {
                     current.Next = current.Next.Next;
-                    if (current.Next != null)
-                    {
-                        current.Next.Prev = current;
-                    }
-                    else
+                    if (current.Next == null)
                     {
                         this.tail = current;
                     }
