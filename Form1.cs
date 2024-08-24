@@ -1028,11 +1028,12 @@ namespace Windows_Forms_Attempt
                 "Imagenes/jugador/Yellow/moto_jugador_arriba_yellow.png",
                 "Imagenes/jugador/Yellow/moto_jugador_abajo_yellow.png"
             };
-            int add_speed = random.Next(1, 3);
+            int add_speed = random.Next(1, 5);
             int actual_speed = executionsPerSecond;
             executionsPerSecond = actual_speed + add_speed;
             Update_Spped();
             this.motorcycle.Set_New_Image_List(images_player);
+            this.motorcycle.SetSpeed(executionsPerSecond);
         }
         public void Can_Consume_Check(object sender, EventArgs e) //Related to timer of consume. This is the functions that is run 2 seconds after consuming an item.
         {
