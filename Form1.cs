@@ -189,7 +189,7 @@ namespace Windows_Forms_Attempt
             };
             // Create the Motorcycle instance
             player = new SingleLinkedForGame();
-            this.motorcycle = new Motorcycle(executionsPerSecond, 0, 90, images_player, this.pictureBox1, 1);
+            this.motorcycle = new Motorcycle(executionsPerSecond, 0, 90, images_player, this.pictureBox1, 1, List_Items_All_Characters[4], List_Power_Ups_All_Characters[4]);
             player.Add(this.motorcycle);
             All_Objects_For_Colisions.Add(this.motorcycle);
 
@@ -204,7 +204,7 @@ namespace Windows_Forms_Attempt
             for (int k = 0; k < 4; k++) //Creation of bots
             {
                 PictureBox box_grid = box_list_bots[k];
-                MotorcycleBot bot = new MotorcycleBot(0, 0, 75, images_bots, box_grid, 5 * k, 7 * k, 1, k); 
+                MotorcycleBot bot = new MotorcycleBot(0, 0, 75, images_bots, box_grid, 5 * k, 7 * k, 1, k, List_Items_All_Characters[k], List_Power_Ups_All_Characters[k]); 
                 list_bots.Add(bot);
                 All_Objects_For_Colisions.Add(bot);
                 Organize_Bots_In_List(bot, k, estelas_boxes);

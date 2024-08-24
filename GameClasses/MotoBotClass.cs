@@ -8,6 +8,9 @@ namespace Windows_Forms_Attempt
         private int stels;
         private PictureBox box;
         private string[] list_images;
+        
+        private PriorityQueue bot_itmes;
+        private ArrayStack bot_powerups;
 
         private int x;
         private int y;
@@ -16,7 +19,7 @@ namespace Windows_Forms_Attempt
         private int fuel;
         private int position_list_indicator; //Indicates the number of position on SingledLinkedListForPlayers.
 
-        public MotorcycleBot(int speed, int stels, int fuel, string[] list_images, PictureBox box, int x, int y, int move_indicator, int position_list_indicator)
+        public MotorcycleBot(int speed, int stels, int fuel, string[] list_images, PictureBox box, int x, int y, int move_indicator, int position_list_indicator, PriorityQueue bot_itmes, ArrayStack bot_powerups )
         {
             this.speed = speed;
             this.stels = stels;
@@ -25,10 +28,22 @@ namespace Windows_Forms_Attempt
             this.box = box;
             this.x = y;
             this.y = x;
+            this.bot_itmes = bot_itmes;
+            this.bot_powerups = bot_powerups;
             this.move_indicator = move_indicator;
             this.position_list_indicator = position_list_indicator;
             Create_Box();
         }
+        public PriorityQueue Retunr_List_Items()
+        {
+            return this.bot_itmes;
+        }
+
+        public ArrayStack Retunr_List_PU()
+        {
+            return bot_powerups;
+        }
+
         public void Add_Stels()
         {
             this.stels++;

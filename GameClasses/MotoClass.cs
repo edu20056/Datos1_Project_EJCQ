@@ -12,22 +12,35 @@ namespace Windows_Forms_Attempt
         private int fuel;
         private PictureBox box;
         private string[] list_images;
+        private PriorityQueue players_itmes;
+        private ArrayStack players_powerups;
 
         private int x;
         private int y;
         private int move_indicator; // Indicates numbers form 1 to 4, which are related to movement.
 
-        public Motorcycle(int speed, int stels, int fuel, string[] list_images, PictureBox box, int move_indicator)
+        public Motorcycle(int speed, int stels, int fuel, string[] list_images, PictureBox box, int move_indicator, PriorityQueue players_items, ArrayStack players_powerups)
         {
             this.speed = speed;
+            this.players_itmes = players_items;
             this.stels = stels;
             this.fuel = fuel;
             this.list_images = list_images;
             this.box = box;
             this.move_indicator = move_indicator;
+            this.players_powerups = players_powerups;
             this.x = 8;
             this.y = 0;
             Create_Box(); // Configure the PictureBox inside the Motorcycle class
+        }
+        public PriorityQueue Retunr_List_Items()
+        {
+            return this.players_itmes;
+        }
+
+        public ArrayStack Retunr_List_PU()
+        {
+            return players_powerups;
         }
 
         public void SetSpeed(int newSpeed)
@@ -64,12 +77,10 @@ namespace Windows_Forms_Attempt
         {
             return this.x;
         }
-
         public int Get_Move_Indicator()
         {
             return this.move_indicator;
         }
-
         public int Get_y_player()
         {
             return this.y;
