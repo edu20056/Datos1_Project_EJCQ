@@ -69,8 +69,8 @@ namespace Windows_Forms_Attempt
         // INITILIZERS//
         public Form1() // Start
         {
-            InitializeComponent_1();
             Create_item_and_powerups_list();
+            InitializeComponent_1();
             CreateGridDisplay();
             for (int i = 0; i < 4; i++)
             {
@@ -189,7 +189,7 @@ namespace Windows_Forms_Attempt
             };
             // Create the Motorcycle instance
             player = new SingleLinkedForGame();
-            this.motorcycle = new Motorcycle(executionsPerSecond, 0, 90, images_player, this.pictureBox1, 1);
+            this.motorcycle = new Motorcycle(executionsPerSecond, 0, 90, images_player, this.pictureBox1, 1, List_Items_All_Characters[4], List_Power_Ups_All_Characters[4]);
             player.Add(this.motorcycle);
             All_Objects_For_Colisions.Add(this.motorcycle);
 
@@ -204,7 +204,7 @@ namespace Windows_Forms_Attempt
             for (int k = 0; k < 4; k++) //Creation of bots
             {
                 PictureBox box_grid = box_list_bots[k];
-                MotorcycleBot bot = new MotorcycleBot(0, 0, 75, images_bots, box_grid, 5 * k, 7 * k, 1, k); 
+                MotorcycleBot bot = new MotorcycleBot(0, 0, 75, images_bots, box_grid, 5 * k, 7 * k, 1, k, List_Items_All_Characters[k], List_Power_Ups_All_Characters[k]); 
                 list_bots.Add(bot);
                 All_Objects_For_Colisions.Add(bot);
                 Organize_Bots_In_List(bot, k, estelas_boxes);
@@ -342,7 +342,7 @@ namespace Windows_Forms_Attempt
                             bot.Move_Image(4);
                             All_Objects_For_Colisions.Remove(bot);
                             Check_Killed_Bots();
-                            Spawn_Obj_Dead_Bot(ind);
+                            Spawn_Obj_Dead_Bot(bot);
                         }
                         else
                         {
@@ -463,7 +463,7 @@ namespace Windows_Forms_Attempt
                             bot.Move_Image(4);
                             All_Objects_For_Colisions.Remove(bot);
                             Check_Killed_Bots();
-                            Spawn_Obj_Dead_Bot(bot.Get_position_list_indicator());
+                            Spawn_Obj_Dead_Bot(bot);
                         }
                     }
                     catch (InvalidCastException)
@@ -479,8 +479,8 @@ namespace Windows_Forms_Attempt
                                 botTimers[bot_colision.Get_position_list_indicator()].Stop();
                                 bot_colision.Move_Image(4);
                                 All_Objects_For_Colisions.Remove(bot_colision);
-                                Spawn_Obj_Dead_Bot(bot_colision.Get_position_list_indicator());
-                                Spawn_Obj_Dead_Bot(bot.Get_position_list_indicator());
+                                Spawn_Obj_Dead_Bot(bot_colision);
+                                Spawn_Obj_Dead_Bot(bot);
 
                                 Check_Killed_Bots();
                             }
@@ -1191,10 +1191,10 @@ namespace Windows_Forms_Attempt
             powerup.Change_Position(nodes, x_pu, y_pu);
             All_items_and_powerups.Add(powerup);
         }
-        public void Spawn_Obj_Dead_Bot(int ind) //Whenever a bot dies, this function runs so their objects (items and powerups) respawn on grid
+        public void Spawn_Obj_Dead_Bot(MotorcycleBot bot) //Whenever a bot dies, this function runs so their objects (items and powerups) respawn on grid
         {
-            PriorityQueue list_items = List_Items_All_Characters[ind];
-            ArrayStack list_PU = List_Power_Ups_All_Characters[ind];
+            PriorityQueue list_items = bot.Retunr_List_Items();
+            ArrayStack list_PU = bot.Retunr_List_PU();
 
             int count = list_items.Count();
             for (int i = 0; i < count; i++)
