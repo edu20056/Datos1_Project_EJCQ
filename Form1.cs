@@ -785,6 +785,9 @@ namespace Windows_Forms_Attempt
                 case Keys.X:
                     timer_player.Stop();
                     break;
+                case  Keys.Escape:
+                    Application.Exit();
+                    break;
             }
         }
         private void Organize_Bots_In_List(MotorcycleBot bot , int indicator, List<PictureBox> estelas_boxes ) //During the code, bots are related to a number which is the SingleLinkedList bot(1 to 4)
